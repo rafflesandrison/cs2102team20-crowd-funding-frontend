@@ -9,7 +9,7 @@
         <b-collapse id="nav-collapse" is-nav>
           <b-navbar-nav>
             <b-nav-item><router-link to="/">Home</router-link></b-nav-item>
-            <b-nav-item><router-link to="/Register">Register</router-link></b-nav-item>
+            <b-nav-item type="dark"><router-link to="/Register">Register</router-link></b-nav-item>
             <b-nav-item><router-link to="/Register">P</router-link></b-nav-item>
           </b-navbar-nav>
 
@@ -39,14 +39,16 @@
         </b-collapse>
       </b-navbar>
     </div>
-    <img alt="Vue logo" src="./assets/logo.png" />
-    <b-button variant="danger">Button</b-button>
+    <!-- <img alt="Vue logo" src="./assets/logo.png" /> -->
+    <!-- <b-button variant="danger">Button</b-button>yle -->
     <router-view />
   </div>
 </template>
 
 <script>
-export default {};
+export default {
+
+};
 </script>
 
 <style>

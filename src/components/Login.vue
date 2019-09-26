@@ -1,12 +1,13 @@
 <template>
-    <div class="container mx-auto mt-5" @submit="onSubmit" @reset="onReset">
+  <div class="container mx-auto mt-5" @submit="onSubmit" @reset="onReset">
     <b-form inline class="form-group">
-      <label class="sr-only" for="inline-form-input-name">Username</label>
+
+      <label class="sr-only" for="inline-form-input-name">Email</label>
       <b-input
         id="inline-form-input-name"
         class="mb-2 mr-sm-2 mb-sm-0"
-        v-model="form.username"
-        placeholder="Email"
+        v-model="form.email"
+        placeholder="abcde@gmail.com"
       ></b-input>
 
       <label class="sr-only" for="inline-form-input-username">Password</label>
@@ -34,12 +35,15 @@
     methods: {
       onSubmit(evt) {
         evt.preventDefault();
-        alert("Username: " + this.form.username);
+        return {
+          email: this.form.email,
+          password: this.form.password
+        }
       },
       onReset(evt) {
         evt.preventDefault()
         // Reset our form values
-        this.form.username = '';
+        this.form.email = '';
         this.form.password = '';
       }
     }
