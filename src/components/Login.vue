@@ -2,7 +2,7 @@
   <b-container fluid>
     <b-row>
       <b-col sm="5" style="margin-top: 120px">
-        <h1 style=" white-space: nowrap; font-size: 70px">It's good to see you again!</h1>
+        <h1 style="font-size: 70px">It's good to see you again!</h1>
       </b-col>
     </b-row>
     <b-row align-h="center">
