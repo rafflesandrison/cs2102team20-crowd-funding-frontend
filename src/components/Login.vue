@@ -1,3 +1,5 @@
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
 <template>
   <div class="container mx-auto mt-5" @submit="onSubmit" @reset="onReset">
     <b-form inline class="form-group">
@@ -23,6 +25,7 @@
 </template>
 
 <script>
+import axios from 'axios';
   export default {
     data() {
       return {
@@ -35,10 +38,13 @@
     methods: {
       onSubmit(evt) {
         evt.preventDefault();
-        return {
-          email: this.form.email,
+        axios.post('http://localhost:3000/login', {
+          username: this.form.email,
           password: this.form.password
-        }
+        })
+          .then(function(response) {
+            alert(response);
+          });
       },
       onReset(evt) {
         evt.preventDefault()
