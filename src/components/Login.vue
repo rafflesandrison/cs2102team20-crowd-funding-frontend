@@ -2,14 +2,9 @@
 
 <template>
   <b-container fluid>
-    <b-row>
-      <b-col sm="5" style="margin-top: 120px">
-        <h1 style="font-size: 70px">It's good to see you again!</h1>
-      </b-col>
-    </b-row>
     <b-row align-h="center">
       <b-col
-        style="margin-top: 240px; max-width: 700px"
+        style=" max-width: 700px"
         align-self="center"
         xl="5"
         lg="6"
@@ -54,8 +49,7 @@ import axios from 'axios';
           password: '',
         }
       }
-    };
-  },
+    },
   methods: {
     onSubmit(evt) {
       evt.preventDefault();
