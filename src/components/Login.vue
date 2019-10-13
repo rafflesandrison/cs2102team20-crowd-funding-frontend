@@ -1,6 +1,7 @@
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
 <template>
+<div>
   <b-container fluid>
     <b-row align-h="center">
       <b-col
@@ -37,6 +38,7 @@
       </b-col>
     </b-row>
   </b-container>
+  </div>
 </template>
 
 <script>

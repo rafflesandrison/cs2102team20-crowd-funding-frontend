@@ -2,14 +2,16 @@
   <div id="app">
     <div>
       <b-navbar toggleable="lg" type="light" variant="light">
-        <b-navbar-brand>GoGuru</b-navbar-brand>
+        <b-navbar-brand>
+          <router-link to="/">GoGuru</router-link>
+          </b-navbar-brand>
 
         <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
         <b-collapse id="nav-collapse" is-nav>
           <b-navbar-nav>
             <b-nav-item>
-              <router-link to="/">Home</router-link>
+              <router-link to="/">Login</router-link>
             </b-nav-item>
             <b-nav-item type="dark">
               <router-link to="/Register">Register</router-link>
