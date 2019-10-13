@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div>
-      <b-navbar toggleable="lg" type="dark" variant="info">
+      <b-navbar toggleable="lg" type="light" variant="light">
         <b-navbar-brand>GoGuru</b-navbar-brand>
 
         <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
@@ -13,9 +13,6 @@
             </b-nav-item>
             <b-nav-item type="dark">
               <router-link to="/Register">Register</router-link>
-            </b-nav-item>
-            <b-nav-item>
-              <router-link to="/Register">P</router-link>
             </b-nav-item>
           </b-navbar-nav>
 
