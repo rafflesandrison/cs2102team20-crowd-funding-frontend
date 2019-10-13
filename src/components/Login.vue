@@ -55,21 +55,25 @@ import axios from 'axios';
   methods: {
     onSubmit(evt) {
       evt.preventDefault();
-      alert(this.form.email + " " + this.form.password);
+      // alert(this.form.email + " " + this.form.password);
       return {
         email: this.form.email,
         password: this.form.password
       };
     },
     methods: {
-      onSubmit(evt) {
+      async onSubmit(evt) {
         evt.preventDefault();
-        axios.post('http://localhost:3000/login', {
+        await axios.post('http://localhost:3000/login', {
           username: this.form.email,
           password: this.form.password
         })
           .then(function(response) {
-            alert(response);
+            if (response == true) {
+              this.$store.isLoggedIn = true;
+            } else {
+              this.$store.isLoggedIn = false;
+            }
           });
       },
       onReset(evt) {
