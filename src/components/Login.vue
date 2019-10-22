@@ -1,11 +1,6 @@
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <template>
   <b-container fluid>
-    <b-row>
-      <b-col sm="5" style="margin-top: 120px">
-        <h1 style="font-size: 70px">It's good to see you again!</h1>
-      </b-col>
-    </b-row>
     <b-row align-h="center">
       <b-col
         style="margin-top: 140px; max-width: 700px"
