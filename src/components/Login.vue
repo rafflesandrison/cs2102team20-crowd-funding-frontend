@@ -1,9 +1,10 @@
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <template>
+<div>
   <b-container fluid>
     <b-row align-h="center">
       <b-col
-        style="margin-top: 140px; max-width: 700px"
+        style=" max-width: 700px"
         align-self="center"
         xl="5"
         lg="6"
@@ -36,6 +37,7 @@
       </b-col>
     </b-row>
   </b-container>
+  </div>
 </template>
 
 <script>
@@ -47,8 +49,7 @@ export default {
         email: "",
         password: ""
       }
-    };
-  },
+    },
   methods: {
     onSubmit(evt) {
       evt.preventDefault();
