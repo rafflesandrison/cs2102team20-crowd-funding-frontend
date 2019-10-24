@@ -49,12 +49,12 @@ export default {
         email: "",
         password: ""
       }
-    },
+    }
+  },
   methods: {
     onSubmit(evt) {
       evt.preventDefault();
-      axios
-        .post("http://localhost:3000/login", {
+      axios.post("http://localhost:3000/login", {
           email: this.form.email,
           password_hash: this.form.password
         })
