@@ -19,6 +19,9 @@
             <b-nav-item type="dark">
               <router-link to="/Projects">Projects</router-link>
             </b-nav-item>
+            <b-nav-item>
+              <router-link to="/create">Create Project</router-link>
+            </b-nav-item>
           </b-navbar-nav>
 
           <!-- Right aligned nav items -->
