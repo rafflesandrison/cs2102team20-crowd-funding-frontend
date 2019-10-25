@@ -16,6 +16,9 @@
             <b-nav-item type="dark">
               <router-link to="/Register">Register</router-link>
             </b-nav-item>
+            <b-nav-item type="dark">
+              <router-link to="/Projects">Projects</router-link>
+            </b-nav-item>
           </b-navbar-nav>
 
           <!-- Right aligned nav items -->
