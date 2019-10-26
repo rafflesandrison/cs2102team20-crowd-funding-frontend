@@ -55,8 +55,40 @@
         ></b-form-textarea>
       </b-form-group>
 
+      <h3>Rewards</h3>
+      <div v-for="(reward, index) in form.projectRewards" :key="index" class="card reward">
+        <b-form-group id="input-reward-name" label="Reward Name:" label-for="input-reward-name">
+          <b-form-input
+                  id="input-reward-name"
+                  v-model="reward.rewardName"
+                  type="text"
+                  required
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group id="input-reward-pledge-amount" label="Reward Pledge Amount:" label-for="input-reward-pledge-amount">
+          <b-form-input
+                  id="input-reward-pledge-amount"
+                  v-model="reward.rewardPledgeAmount"
+                  type="number"
+                  step=".01"
+                  required
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group id="input-reward-description" label="Reward Description: " label-for="textarea-reward-description">
+          <b-form-textarea
+                  id="textarea-reward-description"
+                  v-model="reward.rewardDescription"
+                  placeholder="Tell us more about the reward..."
+                  rows="3"
+                  max-rows="16"
+          ></b-form-textarea>
+        </b-form-group>
+      </div>
+      <b-button variant="success" @click="addMoreReward">Add More Reward</b-button>
+
       <b-button type="submit" variant="primary">Submit</b-button>
     </b-form>
+
     <b-card class="mt-3" header="Form Data Result">
       <pre class="m-0">{{ form }}</pre>
     </b-card>
@@ -76,13 +108,23 @@
           projectImageUrl: 'image.com',
           projectDeadline: "2019-10-15",
           projectFundingGoal: '45000',
-          projectDescription: 'Good bag that is good'
+          projectDescription: 'Good bag that is good',
+          projectRewards: [
+            {
+              rewardName: 'r1',
+              rewardPledgeAmount: '1555',
+              rewardDescription: 'description random',
+            }
+          ]
         },
         categories: ['Arts', 'Crafts', 'Electronics', 'Games']
       }
     },
     methods: {
       onSubmit(evt) {
+
+        // checks
+
         evt.preventDefault()
         axios
                 .post("http://localhost:3000/create", {
@@ -92,12 +134,13 @@
                   projectDeadline: this.form.projectDeadline,
                   projectFundingGoal: this.form.projectFundingGoal,
                   projectDescription: this.form.projectDescription,
+                  projectRewards: this.form.projectRewards
                 })
                 .then(
-                        function(response) {
+                        function (response) {
                           alert("Project Created!");
                         },
-                        function(response) {
+                        function (response) {
                           alert("Unable to create project");
                         }
                 );
@@ -111,7 +154,15 @@
         this.form.projectDeadline = ''
         this.form.projectFundingGoal = ''
         this.form.projectDescription = ''
+      },
+      addMoreReward() {
+        this.form.projectRewards.push({
+          rewardName: '',
+          rewardPledgeAmount: '',
+          rewardDescription: '',
+        })
       }
+
     }
   }
 </script>
@@ -119,5 +170,10 @@
 <style>
   .create-form {
     text-align: left;
+  }
+
+  .reward {
+    padding: 30px;
+    margin-bottom: 16px;
   }
 </style>
