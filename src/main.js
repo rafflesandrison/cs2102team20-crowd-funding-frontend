@@ -3,6 +3,8 @@ import App from "./App.vue";
 import VueRouter from "vue-router";
 import routes from "./routes";
 import BootstrapVue from 'bootstrap-vue';
+import '@fortawesome/fontawesome-free/css/all.css';
+import '@fortawesome/fontawesome-free/js/all.js';
 
 import Vuex from 'vuex';
 
