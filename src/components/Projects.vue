@@ -70,7 +70,7 @@ export default {
 
     loadCategories() {
       axios
-        .get("http://localhost:3000/categories")
+        .get("/categories")
         .then((response) => {
 
           var tempColumns = [];
@@ -91,7 +91,7 @@ export default {
 
     loadProjects() {
       axios
-        .get("http://localhost:3000/projects")
+        .get("/projects")
         .then((response) => {
           this.tableData = response.data;
         })
