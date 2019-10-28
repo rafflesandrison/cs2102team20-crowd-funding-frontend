@@ -1,19 +1,25 @@
 <template>
   <div>
-       Categories:
-       <select v-model="selectedValue" v-on:change="changeCategory">
-         <option disabled value="">Please select one</option>
-         <option v-for="item in categories" :key="item" :value="item">{{item}}</option>
-     </select>
-
-  <b-table ref="table" hover
-    :items="tableData"
-    :fields="fields"
-    :filter="filter"
-    :sort-by.sync="sortBy"
-    :sort-desc.sync="sortDesc"
-    responsive="sm"
-    />
+      <el-row>
+        <div style="margin-bottom: 10px">
+        <el-col>
+          <el-input placeholder="Search category" v-model="filters[0].value"></el-input>
+        </el-col>
+            </div>
+      </el-row>
+        <el-col>
+    <data-tables
+      :data="tableData"
+      :action-col="actionCol"
+      :filters="filters">
+      <el-table-column
+        v-for="title in titles"
+        :prop="title.prop"
+        :label="title.label"
+        :key="title.prop"
+        sortable="custom"/>
+    </data-tables>
+        </el-col>
   </div>
 
 
@@ -25,10 +31,27 @@ export default {
   
   data() {
     return {
-      fields: null,
-      filter: null,
-      sortBy: 'age',
-      sortDesc: false,
+      titles: null,
+      filters: [{
+        prop: 'project_category',
+        value: ''
+      }],
+      actionCol: {
+        props: {
+          label: 'Actions',
+        },
+        buttons: [{
+          props: {
+            type: 'primary'
+          },
+          handler: row => {
+            this.$router.push(`project/${row.project_name}`)
+          },
+          label: 'Select'
+        }]
+      },
+      selectedRow: [],
+      categories: [],
       tableData: {},
       selectedValue: null,
       
@@ -49,14 +72,15 @@ export default {
       axios
         .get("http://localhost:3000/categories")
         .then((response) => {
-          var tempFields = [];
-          response.data.fields.forEach((field) => {
-            tempFields.push({
-              key: field.name,
-              sortable: true
-            })
-            this.fields = tempFields;
+
+          var tempColumns = [];
+          response.data.fields.forEach((element) => {
+            tempColumns.push({
+              prop: element.name,
+              label: element.name.replace(/_/g, ' ')
+            });
           })
+          this.titles = tempColumns;
         })
         .catch((error) => {
           // Failure
@@ -80,3 +104,4 @@ export default {
 
 };
 </script>
+
