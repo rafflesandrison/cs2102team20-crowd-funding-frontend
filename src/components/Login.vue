@@ -1,7 +1,12 @@
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <template>
 <div>
-  <b-container fluid>
+  <b-container v-if="this.$store.state.auth.isLoggedIn">
+    <h4>You are already logged in.</h4>
+    <p>To log out, click on the button below.</p>
+    <b-button variant="danger" @click="logout">Log Out</b-button>
+  </b-container>
+  <b-container v-else fluid>
     <b-row align-h="center">
       <b-col
         style=" max-width: 700px"
@@ -37,6 +42,8 @@
       </b-col>
     </b-row>
   </b-container>
+
+
   </div>
 </template>
 
@@ -54,24 +61,29 @@ export default {
   methods: {
     onSubmit(evt) {
       evt.preventDefault();
-      axios.post("http://localhost:3000/login", {
-          email: this.form.email,
-          password_hash: this.form.password
+      this.$store.dispatch('login', {
+        email: this.form.email,
+        password_hash: this.form.password
+      })
+        .then(() => {
+          this.$message("Login success.");
+          this.$router.push('projects');
         })
-        .then(
-          function(response) {
-            alert("Login Success!");
-          },
-          function(response) {
-            alert("Login Failed!");
-          }
-        );
+        .catch(() => {
+          alert("Login failed.");
+        })
     },
     onReset(evt) {
       evt.preventDefault();
       // Reset our form values
       this.form.email = "";
       this.form.password = "";
+    },
+    logout() {
+      this.$store.dispatch('logout')
+        .then(() => {
+          this.$message("Successfully logged out!");
+        })
     }
   }
 };
