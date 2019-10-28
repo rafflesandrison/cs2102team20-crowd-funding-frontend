@@ -6,7 +6,14 @@
          <option v-for="item in categories" :key="item" :value="item">{{item}}</option>
      </select>
 
-  <b-table ref="table" striped hover :items="categories"></b-table>
+  <b-table ref="table" hover
+    :items="tableData"
+    :fields="fields"
+    :filter="filter"
+    :sort-by.sync="sortBy"
+    :sort-desc.sync="sortDesc"
+    responsive="sm"
+    />
   </div>
 
 
@@ -15,34 +22,59 @@
 import axios from 'axios'
 
 export default {
+  
   data() {
     return {
-      categories: [],
+      fields: null,
+      filter: null,
+      sortBy: 'age',
+      sortDesc: false,
+      tableData: {},
       selectedValue: null,
+      
     }
   },
 
   beforeMount() {
+    this.loadProjects();
     this.loadCategories();
   },
 
   methods: {
     changeCategory() {
-      alert("Change category");
+      // alert("Change category");
     },
 
     loadCategories() {
       axios
         .get("http://localhost:3000/categories")
         .then((response) => {
-            this.categories = response.data;
+          var tempFields = [];
+          response.data.fields.forEach((field) => {
+            tempFields.push({
+              key: field.name,
+              sortable: true
+            })
+            this.fields = tempFields;
           })
+        })
         .catch((error) => {
           // Failure
           alert(error);
         });
-      this.$refs.table.refresh(); // Force a refresh
-    }
+      // this.$refs.table.refresh(); // Force a refresh
+    },
+
+    loadProjects() {
+      axios
+        .get("http://localhost:3000/projects")
+        .then((response) => {
+          this.tableData = response.data;
+        })
+        .catch((error) => {
+          alert(error);
+        });
+    },
 
   },
 
