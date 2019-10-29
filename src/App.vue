@@ -13,13 +13,13 @@
             <b-nav-item>
               <router-link to="/">Login</router-link>
             </b-nav-item>
-            <b-nav-item type="dark">
+            <b-nav-item v-if="!this.$store.state.auth.isLoggedIn" type="dark">
               <router-link to="/Register">Register</router-link>
             </b-nav-item>
             <b-nav-item type="dark">
               <router-link to="/Projects">Projects</router-link>
             </b-nav-item>
-            <b-nav-item>
+            <b-nav-item v-if="this.$store.state.auth.isLoggedIn">
               <router-link to="/create">Create Project</router-link>
             </b-nav-item>
           </b-navbar-nav>
@@ -30,21 +30,22 @@
               <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
               <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
             </b-nav-form>-->
-
+<!-- 
             <b-nav-item-dropdown text="Lang" right>
               <b-dropdown-item href="#">EN</b-dropdown-item>
               <b-dropdown-item href="#">ES</b-dropdown-item>
               <b-dropdown-item href="#">RU</b-dropdown-item>
               <b-dropdown-item href="#">FA</b-dropdown-item>
-            </b-nav-item-dropdown>
+            </b-nav-item-dropdown> -->
 
             <b-nav-item-dropdown right>
               <!-- Using 'button-content' slot -->
               <template v-slot:button-content>
                 <em>User</em>
               </template>
-              <b-dropdown-item href="#">Profile</b-dropdown-item>
-              <b-dropdown-item href="#">Sign Out</b-dropdown-item>
+              <!-- <b-dropdown-item href="#">Profile</b-dropdown-item> -->
+              <b-dropdown-item v-if="this.$store.state.auth.isLoggedIn" href="/" @click="logout">Sign Out</b-dropdown-item>
+              <b-dropdown-item v-else href="/">Log In</b-dropdown-item>
             </b-nav-item-dropdown>
           </b-navbar-nav>
         </b-collapse>
@@ -57,7 +58,17 @@
 </template>
 
 <script>
-export default {};
+export default {
+  methods: {
+    logout() {
+      this.$store.dispatch('logout')
+        .then(() => {
+          this.$message("Successfully logged out!");
+          this.$router.push('/home');
+        })
+    }
+  }
+};
 </script>
 
 <style>
