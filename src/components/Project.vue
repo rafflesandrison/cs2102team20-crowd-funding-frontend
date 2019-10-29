@@ -16,7 +16,7 @@
                     <p>days to go</p>
                 </b-card-text>
                 <p v-if="this.$store.state.auth.isLoggedIn">
-                    <b-button variant="success">Back this project</b-button>
+                    <b-button variant="success" v-b-modal="'backs-modal'">Back this project</b-button>
                 </p>
                 <p v-if="this.$store.state.auth.isLoggedIn">
                     <b-button variant="outline-secondary"><i class="fa fa-heart" aria-hidden="true"></i> Like</b-button>
@@ -65,6 +65,15 @@
                 </b-col>
             </b-row>
         </b-container>
+
+        <b-modal title="Back this project" id="backs-modal" hide-footer>
+                <b-input-group prepend="$" class="mt-3">
+                <b-form-input v-model="backs_amount"></b-form-input>
+                <b-input-group-append>
+                <b-button variant="success" @click="backProject">Back!</b-button>
+                </b-input-group-append>
+            </b-input-group>
+        </b-modal>
     </div>
 </template>
 
@@ -77,6 +86,8 @@
             return {
                 project: null,
                 rewards: null,
+                backDialogVisible: false,
+                backs_amount: 0,
             }
         },
         beforeMount() {
@@ -88,7 +99,7 @@
                 axios
                     .get("http://localhost:3000/project/" + this.$route.params.projectName)
                     .then((response) => {
-                        console.log(response.data);
+                        // console.log(response.data);
                         this.project = response.data
                     })
                     .catch((error) => {
@@ -100,7 +111,7 @@
                 axios
                     .get("http://localhost:3000/project/" + this.$route.params.projectName + "/rewards")
                     .then((response) => {
-                        console.log(response.data);
+                        // console.log(response.data);
                         this.rewards = response.data
                     })
                     .catch(error => {
@@ -124,6 +135,46 @@
                     day = day.length > 1 ? day : '0' + day;
 
                     return year + '/' + month + '/' + day;
+            },
+            backProject() {
+                // TODO: provide front-end check on negative backs-amount
+                axios
+                    .post(`/project/${this.project.project_name}/back`, {
+                        user_email: this.$store.state.auth.currentUser,
+                        project_backed_name: this.project.project_name,
+                        backs_amount: this.backs_amount
+                    })
+                    .then((response) => {
+                        if (response.data == 'Failure') {
+                            this.$message({
+                                message: 'You do not have enough cash.',
+                                type: 'error'
+                            });
+                        } else {
+                            this.$message({
+                                message: 'Successfully backed.',
+                                type: 'success'
+                            });
+                            this.$bvModal.hide('backs-modal')
+                        }
+
+                        
+
+                    })
+                    .catch((error) => {
+                        this.$message({
+                            message: 'An error occurred.',
+                            type: 'warning'
+                        });
+                    });
+
+            },
+            handleClose(done) {
+                this.$confirm('Are you sure to close this dialog?')
+                .then(() => {
+                    done();
+                })
+                .catch(() => {});
             }
         },
     }
