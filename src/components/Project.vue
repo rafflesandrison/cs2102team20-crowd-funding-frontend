@@ -15,10 +15,10 @@
                     <h3>{{this.dayTillDeadline()}}</h3>
                     <p>days to go</p>
                 </b-card-text>
-                <p>
+                <p v-if="this.$store.state.auth.isLoggedIn">
                     <b-button variant="success">Back this project</b-button>
                 </p>
-                <p>
+                <p v-if="this.$store.state.auth.isLoggedIn">
                     <b-button variant="outline-secondary"><i class="fa fa-heart" aria-hidden="true"></i> Like</b-button>
                 </p>
                 <p>This project will only be funding if it reaches
