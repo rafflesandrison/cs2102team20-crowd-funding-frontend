@@ -44,6 +44,7 @@
                 <em>User</em>
               </template>
               <!-- <b-dropdown-item href="#">Profile</b-dropdown-item> -->
+              <b-dropdown-item v-if="this.$store.state.auth.isLoggedIn">{{ this.$store.state.auth.currentUser }}</b-dropdown-item>
               <b-dropdown-item v-if="this.$store.state.auth.isLoggedIn" href="/" @click="logout">Sign Out</b-dropdown-item>
               <b-dropdown-item v-else href="/">Log In</b-dropdown-item>
             </b-nav-item-dropdown>
