@@ -1,5 +1,5 @@
 <template>
-  <div class="create-form container fluid">
+  <div class="create-form container fluid" v-if="this.$store.state.auth.isLoggedIn">
     <b-form @submit="onSubmit" @reset="onReset">
       <b-form-group id="input-group-project-name" label="Project Name:" label-for="input-project-title">
         <b-form-input
@@ -93,6 +93,9 @@
       <pre class="m-0">{{ form }}</pre>
     </b-card>
   </div>
+  <div v-else>
+    <p>You are not logged in. Please log in to create a project.</p>
+    </div>
 </template>
 
 <script>
