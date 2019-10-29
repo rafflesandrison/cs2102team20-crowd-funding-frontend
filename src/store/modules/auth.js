@@ -1,13 +1,18 @@
-import axios from 'axios'
+import axios from "axios";
 
 export default {
   state: {
-    currentUser: null,
+    currentUser: {
+      email: null,
+      full_name: null,
+      phone_number: null,
+      amount: null
+    },
     isLoggedIn: false
   },
   mutations: {
-    userLogin(state, {email}) {
-      state.currentUser = email;
+    userLogin(state, { email, full_name, phone_number, amount }) {
+      state.currentUser = { email, full_name, phone_number, amount };
       state.isLoggedIn = true;
     },
 
@@ -17,16 +22,14 @@ export default {
     }
   },
   actions: {
-    async login({commit}, payload) {
-      alert("This was dispatched");
-      await axios.post('/login', payload)
-        .then(() => {
-          commit('userLogin', payload)
-        })
+    async login({ commit }, payload) {
+      await axios.post("/login", payload).then(responsePacket => {
+        commit("userLogin", responsePacket.data);
+      });
     },
 
-    logout({commit}) {
-      commit('userLogout');
+    logout({ commit }) {
+      commit("userLogout");
     }
   }
-}
+};
