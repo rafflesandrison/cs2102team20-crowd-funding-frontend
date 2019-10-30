@@ -105,7 +105,7 @@ export default {
   },
   data() {
     return {
-      amount: "00.00",
+      amount: this.$store.state.auth.currentUser.amount,
       amountTopUp: "",
       amountTopUpState: null,
       previousTopUps: []

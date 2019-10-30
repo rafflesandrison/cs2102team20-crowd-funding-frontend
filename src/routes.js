@@ -1,7 +1,6 @@
 import Register from "./components/Register.vue";
 import Home from "./components/Home.vue";
 import Login from "./components/Login.vue";
-import Register from "./components/Register.vue";
 import Profile from "./components/Profile.vue";
 import Wallet from "./components/Wallet.vue";
 import Projects from "./components/Projects.vue";
