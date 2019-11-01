@@ -16,7 +16,9 @@
           <p>days to go</p>
         </b-card-text>
         <p v-if="this.$store.state.auth.isLoggedIn">
-          <b-button variant="success" v-b-modal="'backs-modal'">Back this project</b-button>
+          <b-button variant="warning" v-b-modal.backs-modal @click="listBackings">Manage Backings</b-button>
+          <!-- <br/> -->
+          <!-- <b-button v-if="is_backed" variant="danger" v-b-modal.backs-modal @click="listBackings">Unback this project</b-button> -->
         </p>
         <p v-if="this.$store.state.auth.isLoggedIn">
           <b-button variant="outline-secondary">
@@ -67,14 +69,30 @@
       </b-row>
     </b-container>
 
-    <b-modal title="Back this project" id="backs-modal" hide-footer>
+    <b-modal title="Manage Backings" id="backs-modal" hide-footer>
+      <div>
       <b-input-group prepend="$" class="mt-3">
         <b-form-input v-model="backs_amount"></b-form-input>
         <b-input-group-append>
           <b-button variant="success" @click="backProject">Back!</b-button>
         </b-input-group-append>
       </b-input-group>
+      </div>
+      <div v-if="is_backed">
+        <data-tables
+      :data="tableData"
+      :action-col="actionCol"
+      :filters="filters">
+      <el-table-column
+        v-for="title in titles"
+        :prop="title.prop"
+        :label="title.label"
+        :key="title.prop"
+        sortable="custom"/>
+    </data-tables>
+        </div>
     </b-modal>
+
   </div>
 </template>
 
@@ -88,12 +106,41 @@ export default {
       project: null,
       rewards: null,
       backDialogVisible: false,
-      backs_amount: 0
+      backs_amount: 0,
+      is_backed: null,
+      titles: null,
+      tableData: null,
+
+      actionCol: {
+        props: {
+          label: 'Actions',
+        },
+        buttons: [{
+          props: {
+            type: 'danger'
+          },
+          handler: row => {
+                 this.$confirm("Are you sure you want to unback this project?")
+        .then(() => {
+          axios.post(`/project/${this.$route.params.projectName}/unback/${row.transaction_id}`)
+              .then(() => {
+                this.listBackings();
+                this.isBacked();
+              });
+        })
+        .catch(() => {});
+          },
+          label: 'Unback'
+        }]
+      },
     };
   },
   beforeMount() {
     this.loadProject();
     this.loadRewards();
+    this.isBacked();
+  },
+  computed: {
   },
   methods: {
     loadProject() {
@@ -141,6 +188,21 @@ export default {
 
       return year + "/" + month + "/" + day;
     },
+    isBacked() {
+      axios
+        .get(`/project/${this.$route.params.projectName}/back/${this.$store.state.user.email}`)
+        .then((response) => {
+          if (response.data.length > 0) {
+            this.is_backed = true;
+          } else {
+            this.is_backed = false;
+          }
+        })
+        .catch((error) => {
+          alert(error);
+        });
+    },
+    
     backProject() {
       // TODO: provide front-end check on negative backs-amount
       axios
@@ -160,15 +222,41 @@ export default {
               message: "Successfully backed.",
               type: "success"
             });
-            this.$bvModal.hide("backs-modal");
+            // this.$bvModal.hide("backs-modal");
+            this.is_backed = true;
+            this.listBackings();
           }
         })
-        .catch(error => {
+        .catch(() => {
           this.$message({
             message: "An error occurred.",
             type: "warning"
           });
         });
+    },
+    listBackings() {
+      if (this.is_backed) {
+        axios
+        .get(`/project/${this.$route.params.projectName}/back/${this.$store.state.user.email}/list/headers`)
+        .then((response) => {
+          var tempColumns = [];
+          response.data.fields.forEach((element) => {
+            tempColumns.push({
+              prop: element.name,
+              label: element.name.replace(/_/g, ' ')
+            });
+          })
+          this.titles = tempColumns;
+        })
+        .catch(() => {});
+
+        axios
+        .get(`/project/${this.$route.params.projectName}/back/${this.$store.state.user.email}/list`)
+        .then((response) => {
+          this.tableData = response.data;
+        })
+        .catch(() => {});
+      }
     },
     handleClose(done) {
       this.$confirm("Are you sure to close this dialog?")

@@ -15,15 +15,16 @@ export default {
   },
   actions: {
     async login({ commit }, payload) {
-      await axios.post("/login", payload).then(responsePacket => {
-        const email = responsePacket.data.email;
-        const full_name = responsePacket.data.full_name;
-        const phone_number = responsePacket.data.phone_number;
-        const amount = responsePacket.data.amount;
+      await axios.post("/login", payload)
+        .then(responsePacket => {
+          const email = responsePacket.data.email;
+          const full_name = responsePacket.data.full_name;
+          const phone_number = responsePacket.data.phone_number;
+          const amount = responsePacket.data.amount;
 
-        commit("updateUser", { email, full_name, phone_number });
-        commit("initializeWallet", { amount });
-        commit("userLogin");
+          commit("updateUser", { email, full_name, phone_number });
+          commit("initializeWallet", { amount });
+          commit("userLogin");
       });
     },
 

@@ -61,8 +61,8 @@ export default {
           this.$message("Login success.");
           this.$router.push("projects");
         })
-        .catch(() => {
-          alert("Login failed.");
+        .catch((error) => {
+          alert("Login failed." + error);
         });
     },
     onReset(evt) {
