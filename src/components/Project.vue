@@ -21,7 +21,7 @@
           <!-- <b-button v-if="is_backed" variant="danger" v-b-modal.backs-modal @click="listBackings">Unback this project</b-button> -->
         </p>
         <p v-if="this.$store.state.auth.isLoggedIn">
-          <b-button variant="outline-secondary">
+          <b-button :pressed.sync="is_liked" variant="outline-danger" @click="toggleLikeProject">
             <i class="fa fa-heart" aria-hidden="true"></i> Like
           </b-button>
         </p>
@@ -110,6 +110,7 @@ export default {
       is_backed: null,
       titles: null,
       tableData: null,
+      is_liked: null,
 
       actionCol: {
         props: {
@@ -139,6 +140,7 @@ export default {
     this.loadProject();
     this.loadRewards();
     this.isBacked();
+    this.isLiked();
   },
   computed: {
   },
@@ -256,6 +258,30 @@ export default {
           this.tableData = response.data;
         })
         .catch(() => {});
+      }
+    },
+    isLiked() {
+      axios.get(`/project/${this.$route.params.projectName}/islike/${this.$store.state.user.email}`)
+        .then((response) => {
+          if (response.data.length == 0) {
+            this.is_liked = false;
+          } else {
+            this.is_liked = true;
+          }
+        })
+    },
+    toggleLikeProject() {
+      if (!this.is_liked) {
+        axios.get(`/project/${this.$route.params.projectName}/unlike/${this.$store.state.user.email}`)
+          .then(() => {
+            this.is_liked = false;
+          });
+      } else {
+
+        axios.get(`/project/${this.$route.params.projectName}/like/${this.$store.state.user.email}`)
+          .then(() => {
+            this.is_liked = true;
+          });
       }
     },
     handleClose(done) {
