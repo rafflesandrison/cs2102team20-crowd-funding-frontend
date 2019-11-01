@@ -46,7 +46,7 @@
               <!-- <b-dropdown-item href="#">Profile</b-dropdown-item> -->
               <b-dropdown-item
                 v-if="this.$store.state.auth.isLoggedIn"
-              >{{ this.$store.state.auth.currentUser.email }}</b-dropdown-item>
+              >{{ this.$store.state.user.email }}</b-dropdown-item>
               <b-dropdown-item
                 v-if="this.$store.state.auth.isLoggedIn"
                 href="/"

@@ -145,7 +145,7 @@ export default {
       // TODO: provide front-end check on negative backs-amount
       axios
         .post(`/project/${this.project.project_name}/back`, {
-          user_email: this.$store.state.auth.currentUser.email,
+          user_email: this.$store.state.user.email,
           project_backed_name: this.project.project_name,
           backs_amount: this.backs_amount
         })
