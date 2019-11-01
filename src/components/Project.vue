@@ -125,7 +125,7 @@ export default {
           axios.post(`/project/${this.$route.params.projectName}/unback/${row.transaction_id}`)
               .then(() => {
                 this.listBackings();
-                this.is_backed();
+                this.isBacked();
               });
         })
         .catch(() => {});
