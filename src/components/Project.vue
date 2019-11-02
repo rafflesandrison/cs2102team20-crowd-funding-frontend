@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-jumbotron v-bind:header="project.project_name">
+    <b-jumbotron v-bind:header="project.project_name" v-if="this.$store.state.auth.isLoggedIn">
       <!-- Project Image  -->
       <b-card img-src="https://placekitten.com/300/300" img-alt="Card image" img-left class="mb-3">
         <b-card-text>
@@ -32,42 +32,71 @@
       </b-card>
     </b-jumbotron>
 
-    <!-- Navigation between Campaign | Project Update | Feedback | Comments -->
-    <div class="nav-bar">
-      <b-nav tabs fill>
-        <b-nav-item active>Campaign</b-nav-item>
-        <b-nav-item>Project Update</b-nav-item>
-        <b-nav-item>Feedback</b-nav-item>
-        <b-nav-item disabled>Comments</b-nav-item>
-      </b-nav>
+    <!-- Tabs between Campaign | Project Update | Feedback | Comments -->
+    <div v-if="this.$store.state.auth.isLoggedIn">
+      <b-tabs content-class="mt-3" fill>
+        <b-tab title="Campaign" active>
+          <!-- Campaign: Description and Rewards -->
+          <b-container class="bv-example-row">
+            <b-row>
+              <b-col cols="8">
+                <h2>Project Description</h2>
+                <p>{{this.project.project_description}}}</p>
+              </b-col>
+              <b-col>
+                <h2>Rewards</h2>
+                <b-card
+                        :title="'$' + reward.reward_pledge_amount"
+                        tag="article"
+                        style="max-width: 20rem;"
+                        class="mb-2"
+                        v-for="(reward, index) in rewards"
+                        :key="index"
+                >
+                  <b-card-text>
+                    <h6>{{reward.reward_name}}</h6>
+                    <p>{{reward.reward_description}}</p>
+                  </b-card-text>
+                  <b-button href="#" variant="primary">Pledge</b-button>
+                </b-card>
+              </b-col>
+            </b-row>
+          </b-container>
+
+        </b-tab>
+        <b-tab title="Updates">
+          <!-- Project Update -->
+          <b-container class="bv-example-row">
+            <h2>Project Update</h2>
+            <b-card
+                    :title="update.project_title"
+                    tag="article"
+                    style="max-width: 60rem;"
+                    class="mb-2"
+                    v-for="(update, index) in updates"
+                    :key="index"
+            >
+              <b-card-text>
+                <h4>{{update.update_title}}</h4>
+                <p>{{update.update_description}}</p>
+              </b-card-text>
+            </b-card>
+          </b-container>
+        </b-tab>
+        <b-tab title="Comments">
+          <comment-section
+                  v-bind:comments="comments"
+                  @post:comment="postComment"
+          />
+        </b-tab>
+      </b-tabs>
     </div>
 
-    <!-- Description and Rewards -->
-    <b-container class="bv-example-row">
-      <b-row>
-        <b-col cols="8">
-          <h2>Project Description</h2>
-          <p>{{this.project.project_description}}}</p>
-        </b-col>
-        <b-col>
-          <h2>Rewards</h2>
-          <b-card
-            :title="'$' + reward.reward_pledge_amount"
-            tag="article"
-            style="max-width: 20rem;"
-            class="mb-2"
-            v-for="(reward, index) in rewards"
-            :key="index"
-          >
-            <b-card-text>
-              <h6>{{reward.reward_name}}</h6>
-              <p>{{reward.reward_description}}</p>
-            </b-card-text>
-            <b-button href="#" variant="primary">Pledge</b-button>
-          </b-card>
-        </b-col>
-      </b-row>
-    </b-container>
+    <div v-else>
+      <p>Please log in dude.</p>
+    </div>
+
+
 
     <b-modal title="Manage Backings" id="backs-modal" hide-footer>
       <div>
@@ -98,13 +127,51 @@
 
 <script>
 import axios from "axios";
+import CommentSection from "../sub-components/CommentSection";
 
 export default {
   name: "Project",
+  components: {
+    CommentSection
+  },
   data() {
     return {
       project: null,
       rewards: null,
+      updates: [
+        {
+          project_name: 'Sample Project Name #1',
+          update_title: "Woah! We hit our goal...",
+          update_description: "Well that was fast. We have hit our goal of $90k. We are floored by your support !",
+          update_time: "2019-07-02 16:04:56.874028"
+        },
+        {
+          project_name: 'Sample Project Name #2',
+          update_title: "Thank you for your support !",
+          update_description: "We are so pleased to announce that..... We have hit our goal of $1m! We are floored by your support !",
+          update_time: "2019-08-02 16:04:56.874028"
+        },
+      ],
+      comments: [
+          {
+              project_name: 'Project 1',
+              comment_text: 'Comment text testing one two three.',
+              comment_date: '2019-06-02 13:00:56.874028',
+              email: 'cabi@example.com'
+          },
+          {
+              project_name: 'Project 1',
+              comment_text: 'Comment text testing one two three.',
+              comment_date: '2019-07-02 13:00:56.874028',
+              email: 'cabi@example.com'
+          },
+          {
+              project_name: 'Project 1',
+              comment_text: 'Comment text testing one two three.',
+              comment_date: '2019-07-02 07:00:56.874028',
+              email: 'abi@example.com'
+          },
+      ],
       backDialogVisible: false,
       backs_amount: 0,
       is_backed: null,
@@ -141,6 +208,8 @@ export default {
   beforeMount() {
     this.loadProject();
     this.loadRewards();
+    this.loadUpdates();
+    this.loadComments();
     this.isBacked();
     this.isLiked();
   },
@@ -174,23 +243,49 @@ export default {
           alert(error);
         });
     },
-    dayTillDeadline() {
-      const date1 = new Date();
-      const date2 = new Date(this.project.project_deadline);
-      const diffTime = Math.abs(date2 - date1);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      return diffDays;
+    loadUpdates() {
+      axios
+              .get(
+                      "http://localhost:3000/project/" +
+                      this.$route.params.projectName +
+                      "/updates"
+              )
+              .then(response => {
+                // console.log(response.data);
+                this.updates = response.data;
+              })
+              .catch(error => {
+                alert(error);
+              });
     },
-    getFormattedDate(date) {
-      var year = date.getFullYear();
-
-      var month = (1 + date.getMonth()).toString();
-      month = month.length > 1 ? month : "0" + month;
-
-      var day = date.getDate().toString();
-      day = day.length > 1 ? day : "0" + day;
-
-      return year + "/" + month + "/" + day;
+    loadComments() {
+      axios
+              .get(
+                      "http://localhost:3000/project/" +
+                      this.$route.params.projectName +
+                      "/comments"
+              )
+              .then(response => {
+                // console.log(response.data);
+                this.comments = response.data;
+              })
+              .catch(error => {
+                alert(error);
+              });
+    },
+    postComment(newComment) {
+      axios
+              .post("http://localhost:3000/project/" + this.$route.params.projectName + "/comments", {
+                newComment: newComment,
+                commenterEmail: this.$store.state.user.email,
+                projectName: this.project.project_name,
+              })
+              .then(response => {
+                this.$set(this.comments, 0, response.data)
+              })
+              .catch(error => {
+                alert(error)
+              });
     },
     isBacked() {
       axios
@@ -286,13 +381,24 @@ export default {
           });
       }
     },
-    handleClose(done) {
-      this.$confirm("Are you sure to close this dialog?")
-        .then(() => {
-          done();
-        })
-        .catch(() => {});
-    }
+    dayTillDeadline() {
+      const date1 = new Date();
+      const date2 = new Date(this.project.project_deadline);
+      const diffTime = Math.abs(date2 - date1);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays;
+    },
+    getFormattedDate(date) {
+      var year = date.getFullYear();
+
+      var month = (1 + date.getMonth()).toString();
+      month = month.length > 1 ? month : "0" + month;
+
+      var day = date.getDate().toString();
+      day = day.length > 1 ? day : "0" + day;
+
+      return year + "/" + month + "/" + day;
+    },
   }
 };
 </script>
