@@ -122,14 +122,16 @@ export default {
           },
           handler: row => {
                  this.$confirm("Are you sure you want to unback this project?")
-        .then(() => {
-          axios.post(`/project/${this.$route.params.projectName}/unback/${row.transaction_id}`)
-              .then(() => {
-                this.listBackings();
-                this.isBacked();
-              });
-        })
-        .catch(() => {});
+                .then(() => {
+                  axios.post(`/project/${this.$route.params.projectName}/unback/${row.transaction_id}`, {
+                    user_email: this.$store.state.user.email,
+                  })
+                      .then(() => {
+                        this.listBackings();
+                        this.isBacked();
+                      });
+                    })
+        .catch((error) => {alert(error)});
           },
           label: 'Unback'
         }]
