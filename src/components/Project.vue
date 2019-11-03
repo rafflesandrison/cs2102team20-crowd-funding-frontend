@@ -40,6 +40,9 @@
           <campaign-section
                   v-bind:project="project"
                   v-bind:rewards="rewards"
+                  v-bind:backedRewards="backedRewards"
+                  @pledge:reward="backProject"
+                  @unpledge:reward="unbackProject"
           />
         </b-tab>
         <b-tab title="Updates">
@@ -61,7 +64,7 @@
       <p>Please log in dude.</p>
     </div>
 
-
+    <el-button @click="getBackedRewards">Click ME!</el-button>
 
     <b-modal title="Manage Backings" id="backs-modal" hide-footer>
       <div>
@@ -147,7 +150,7 @@ export default {
       titles: null,
       tableData: null,
       is_liked: null,
-
+      backedRewards: [],
       actionCol: {
         props: {
           label: 'Actions',
@@ -181,13 +184,15 @@ export default {
     this.loadComments();
     this.isBacked();
     this.isLiked();
+    this.getBackedRewards();
   },
   computed: {
   },
   methods: {
     loadProject() {
       axios
-        .get("http://localhost:3000/project/" + this.$route.params.projectName)
+        .get("http://localhost:3000/project/" +
+                this.$route.params.projectName)
         .then(response => {
           // console.log(response.data);
           this.project = response.data;
@@ -242,6 +247,23 @@ export default {
                 alert(error);
               });
     },
+    getBackedRewards() {
+      axios
+              .get("http://localhost:3000/project/backedRewards/" + this.$route.params.projectName + "/"
+                      + this.$store.state.user.email)
+              .then(response => {
+                this.backedRewards = response.data.map(reward => reward.reward_name)
+                //console.log("Backed projects are")
+                //console.log(this.backedRewards)
+                //console.log("Response data\n")
+                //console.log(response.data)
+                //console.log("Response data after turning to array is\n")
+                //console.log(response.data.map(reward => reward.reward_name))
+              })
+              .catch(error => {
+                alert(error)
+              })
+    },
     postComment(newComment) {
       axios
               .post("http://localhost:3000/project/" + this.$route.params.projectName + "/comments", {
@@ -270,14 +292,13 @@ export default {
           alert(error);
         });
     },
-    
-    backProject() {
-      // TODO: provide front-end check on negative backs-amount
+    backProject(reward) {
       axios
         .post(`/project/${this.project.project_name}/back`, {
           user_email: this.$store.state.user.email,
           project_backed_name: this.project.project_name,
-          backs_amount: this.backs_amount
+          reward_name: reward.reward_name,
+          backs_amount: reward.back_amount,
         })
         .then(response => {
           if (response.data == "Failure") {
@@ -293,6 +314,7 @@ export default {
             // this.$bvModal.hide("backs-modal");
             this.is_backed = true;
             this.listBackings();
+            this.$set(this.backedRewards, 0, reward.reward_name)
           }
         })
         .catch(() => {
@@ -301,6 +323,37 @@ export default {
             type: "warning"
           });
         });
+    },
+    unbackProject(reward) {
+      axios
+              .post(`/project/${this.project.project_name}/unback`, {
+                user_email: this.$store.state.user.email,
+                project_backed_name: this.project.project_name,
+                reward_name: reward.reward_name,
+              })
+              .then(response => {
+                if (response.data == "Failure") {
+                  this.$message({
+                    message: "Unable to unback at the moment...",
+                    type: "error"
+                  });
+                } else {
+                  this.$message({
+                    message: "Successfully unback",
+                    type: "success"
+                  });
+                  // this.$bvModal.hide("backs-modal");
+                  this.is_backed = false;
+                  this.listBackings();
+                  this.$delete(this.backedRewards, this.backedRewards.indexOf(reward.reward_name))
+                }
+              })
+              .catch(() => {
+                this.$message({
+                  message: "An error occurred.",
+                  type: "warning"
+                });
+              });
     },
     listBackings() {
       if (this.is_backed) {
