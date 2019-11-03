@@ -37,51 +37,16 @@
       <b-tabs content-class="mt-3" fill>
         <b-tab title="Campaign" active>
           <!-- Campaign: Description and Rewards -->
-          <b-container class="bv-example-row">
-            <b-row>
-              <b-col cols="8">
-                <h2>Project Description</h2>
-                <p>{{this.project.project_description}}}</p>
-              </b-col>
-              <b-col>
-                <h2>Rewards</h2>
-                <b-card
-                        :title="'$' + reward.reward_pledge_amount"
-                        tag="article"
-                        style="max-width: 20rem;"
-                        class="mb-2"
-                        v-for="(reward, index) in rewards"
-                        :key="index"
-                >
-                  <b-card-text>
-                    <h6>{{reward.reward_name}}</h6>
-                    <p>{{reward.reward_description}}</p>
-                  </b-card-text>
-                  <b-button href="#" variant="primary">Pledge</b-button>
-                </b-card>
-              </b-col>
-            </b-row>
-          </b-container>
-
+          <campaign-section
+                  v-bind:project="project"
+                  v-bind:rewards="rewards"
+          />
         </b-tab>
         <b-tab title="Updates">
           <!-- Project Update -->
-          <b-container class="bv-example-row">
-            <h2>Project Update</h2>
-            <b-card
-                    :title="update.project_title"
-                    tag="article"
-                    style="max-width: 60rem;"
-                    class="mb-2"
-                    v-for="(update, index) in updates"
-                    :key="index"
-            >
-              <b-card-text>
-                <h4>{{update.update_title}}</h4>
-                <p>{{update.update_description}}</p>
-              </b-card-text>
-            </b-card>
-          </b-container>
+          <update-section
+                  v-bind:updates="updates"
+          />
         </b-tab>
         <b-tab title="Comments">
           <comment-section
@@ -127,12 +92,16 @@
 
 <script>
 import axios from "axios";
+import CampaignSection from "../sub-components/CampaignSection";
+import UpdateSection from "../sub-components/UpdateSection";
 import CommentSection from "../sub-components/CommentSection";
 
 export default {
   name: "Project",
   components: {
-    CommentSection
+    CampaignSection,
+    UpdateSection,
+    CommentSection,
   },
   data() {
     return {
