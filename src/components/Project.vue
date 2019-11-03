@@ -4,12 +4,12 @@
       <!-- Project Image  -->
       <b-card img-src="https://placekitten.com/300/300" img-alt="Card image" img-left class="mb-3">
         <b-card-text>
-          <h1>$50,XXX CURRENT FUNDING</h1>
+          <h1>${{project.project_current_funding}}</h1>
           <p>pledged of ${{project.project_funding_goal}} funding goal</p>
         </b-card-text>
         <b-card-text>
-          <h3>3,xxx</h3>
-          <p>backers</p>
+          <h3>{{rewardsBackedCount}}</h3>
+          <p>rewards pledged by backers</p>
         </b-card-text>
         <b-card-text>
           <h3>{{this.dayTillDeadline()}}</h3>
@@ -144,6 +144,7 @@ export default {
               email: 'abi@example.com'
           },
       ],
+      rewardsBackedCount: 0,
       backDialogVisible: false,
       backs_amount: 0,
       is_backed: null,
@@ -182,6 +183,7 @@ export default {
     this.loadRewards();
     this.loadUpdates();
     this.loadComments();
+    this.loadTotalBackers();
     this.isBacked();
     this.isLiked();
     this.getBackedRewards();
@@ -247,6 +249,22 @@ export default {
                 alert(error);
               });
     },
+    loadTotalBackers() {
+      axios
+              .get(
+                      "http://localhost:3000/project/" +
+                      this.$route.params.projectName +
+                      "/backers"
+              )
+              .then(response => {
+                console.log("loadTotalBackers")
+                console.log(response.data);
+                this.rewardsBackedCount = response.data.length;
+              })
+              .catch(error => {
+                alert(error);
+              });
+    },
     getBackedRewards() {
       axios
               .get("http://localhost:3000/project/backedRewards/" + this.$route.params.projectName + "/"
@@ -293,6 +311,14 @@ export default {
         });
     },
     backProject(reward) {
+      console.log("backProject")
+      console.log(`/project/${this.project.project_name}/back`)
+      console.log({
+        user_email: this.$store.state.user.email,
+        project_backed_name: this.project.project_name,
+        reward_name: reward.reward_name,
+        backs_amount: reward.back_amount,
+      })
       axios
         .post(`/project/${this.project.project_name}/back`, {
           user_email: this.$store.state.user.email,
@@ -314,7 +340,12 @@ export default {
             // this.$bvModal.hide("backs-modal");
             this.is_backed = true;
             this.listBackings();
-            this.$set(this.backedRewards, 0, reward.reward_name)
+            this.$set(this.backedRewards, this.backedRewards.length, reward.reward_name)
+            this.$set(this.project, 'project_current_funding',
+                    this.project.project_current_funding + parseFloat(reward.back_amount))
+            this.$set(this, 'rewardsBackedCount', this.rewardsBackedCount + 1)
+            console.log("back: backedRewards")
+            console.log(this.backedRewards)
           }
         })
         .catch(() => {
@@ -325,6 +356,13 @@ export default {
         });
     },
     unbackProject(reward) {
+      console.log("unbackProject")
+      console.log(`/project/${this.project.project_name}/unback`)
+      console.log({
+        user_email: this.$store.state.user.email,
+        project_backed_name: this.project.project_name,
+        reward_name: reward.reward_name,
+      })
       axios
               .post(`/project/${this.project.project_name}/unback`, {
                 user_email: this.$store.state.user.email,
@@ -346,6 +384,11 @@ export default {
                   this.is_backed = false;
                   this.listBackings();
                   this.$delete(this.backedRewards, this.backedRewards.indexOf(reward.reward_name))
+                  this.$set(this.project, 'project_current_funding',
+                          this.project.project_current_funding - parseFloat(reward.back_amount))
+                  this.$set(this, 'rewardsBackedCount', this.rewardsBackedCount - 1)
+                  console.log("unback: backedRewards")
+                  console.log(this.backedRewards)
                 }
               })
               .catch(() => {

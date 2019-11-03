@@ -59,9 +59,9 @@
                         back_amount: rewardAmount
                     })
                 } else {
-                    if (this.$store.state.wallet.amount < rewardAmount) {
+                    if (parseFloat(this.$store.state.wallet.amount) < parseFloat(rewardAmount)) {
                         alert("Wallet balance is low. You might want to top up. Current balance is "
-                            + this.$store.state.wallet.amount)
+                            + this.$store.state.wallet.amount + " and the reward amount is " + rewardAmount)
                         return
                     }
 
