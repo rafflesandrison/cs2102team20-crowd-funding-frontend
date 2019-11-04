@@ -71,7 +71,7 @@
       <b-input-group prepend="$" class="mt-3">
         <b-form-input v-model="backs_amount"></b-form-input>
         <b-input-group-append>
-          <b-button variant="success" @click="backProject">Back!</b-button>
+          <b-button variant="success" @click="backProjectWithoutReward">Back!</b-button>
         </b-input-group-append>
       </b-input-group>
       </div>
@@ -201,7 +201,7 @@ export default {
         })
         .catch(error => {
           // Failure
-          alert(error);
+          alert("loadProjet(): " + error);
         });
     },
     loadRewards() {
@@ -216,7 +216,7 @@ export default {
           this.rewards = response.data;
         })
         .catch(error => {
-          alert(error);
+          alert("loadReward()" + error);
         });
     },
     loadUpdates() {
@@ -231,7 +231,7 @@ export default {
                 this.updates = response.data;
               })
               .catch(error => {
-                alert(error);
+                alert("loadUpdates()" + error);
               });
     },
     loadComments() {
@@ -246,7 +246,7 @@ export default {
                 this.comments = response.data;
               })
               .catch(error => {
-                alert(error);
+                alert("loadComments()" + error);
               });
     },
     loadTotalBackers() {
@@ -279,7 +279,7 @@ export default {
                 //console.log(response.data.map(reward => reward.reward_name))
               })
               .catch(error => {
-                alert(error)
+                alert("getBackedRewards() " + error)
               })
     },
     postComment(newComment) {
@@ -293,7 +293,7 @@ export default {
                 this.$set(this.comments, 0, response.data)
               })
               .catch(error => {
-                alert(error)
+                alert("postComment()" + error)
               });
     },
     isBacked() {
@@ -307,7 +307,7 @@ export default {
           }
         })
         .catch((error) => {
-          alert(error);
+          alert("isBacked()" + error);
         });
     },
     backProject(reward) {
@@ -346,6 +346,40 @@ export default {
             this.$set(this, 'rewardsBackedCount', this.rewardsBackedCount + 1)
             console.log("back: backedRewards")
             console.log(this.backedRewards)
+          }
+        })
+        .catch((error) => {
+          this.$message({
+            message: "An error occurred.",
+            type: "warning"
+          });
+
+          alert(JSON.stringify(error));
+        });
+    },
+
+    backProjectWithoutReward() {
+           // TODO: provide front-end check on negative backs-amount
+      axios
+        .post(`/project/${this.project.project_name}/back`, {
+          user_email: this.$store.state.user.email,
+          project_backed_name: this.project.project_name,
+          backs_amount: this.backs_amount
+        })
+        .then(response => {
+          if (response.data == "Failure") {
+            this.$message({
+              message: "You do not have enough cash.",
+              type: "error"
+            });
+          } else {
+            this.$message({
+              message: "Successfully backed.",
+              type: "success"
+            });
+            // this.$bvModal.hide("backs-modal");
+            this.is_backed = true;
+            this.listBackings();
           }
         })
         .catch(() => {
@@ -419,7 +453,9 @@ export default {
         .then((response) => {
           this.tableData = response.data;
         })
-        .catch(() => {});
+        .catch((error) => {
+          alert("listBackings()" + error)
+        });
       }
     },
     isLiked() {
