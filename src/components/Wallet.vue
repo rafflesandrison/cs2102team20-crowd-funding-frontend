@@ -224,8 +224,8 @@ export default {
           .then(() => {
             this.$message("Amount Top-Up Success.");
           })
-          .catch(() => {
-            alert("Amount Top-Up Failed.");
+          .catch((error) => {
+            alert("Amount Top-Up Failed." + error);
           });
       }
     },
