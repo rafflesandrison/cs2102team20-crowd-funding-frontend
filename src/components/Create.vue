@@ -59,18 +59,12 @@
                           //this.projectNames.push(parsedProjectName)
                           //console.log(this.projectNames.toString());
                           alert("Project Created!");
-                          this.createSuccess = true
+                          this.$router.push('/project/' + form.projectName)
                         }
                 )
                 .catch(error => {
                   alert(error)
                 })
-                .finally(() => {
-                  if (this.createSuccess) {
-                    console.log("redirecting to new page")
-                    this.$router.push('/project/' + form.projectName)
-                  }
-                });
       },
     }
   }

@@ -46,6 +46,7 @@
               <!-- <b-dropdown-item href="#">Profile</b-dropdown-item> -->
               <b-dropdown-item
                 v-if="this.$store.state.auth.isLoggedIn"
+                @click="goProfilePage"
               >{{ this.$store.state.user.email }}</b-dropdown-item>
               <b-dropdown-item
                 v-if="this.$store.state.auth.isLoggedIn"
@@ -72,6 +73,9 @@ export default {
         this.$message("Successfully logged out!");
         this.$router.push("/home");
       });
+    },
+    goProfilePage() {
+      this.$router.push("/profile");
     }
   }
 };
