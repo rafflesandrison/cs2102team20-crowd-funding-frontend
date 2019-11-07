@@ -7,6 +7,7 @@ import Create from "./components/Create.vue";
 import Project from "./components/Project.vue";
 import Profile from "./components/Profile.vue";
 import EditProject from "./components/EditProject.vue";
+import Users from "./components/Users.vue";
 
 const routes = [
   { path: "/", redirect: "/login" },
@@ -19,6 +20,7 @@ const routes = [
   { path: "/project/:projectName", component: Project },
   { path: `/profile/:email`, component: Profile },
   { path: `/editProject/:projectName`, component: EditProject },
+  { path: `/users`, component: Users },
 ];
 
 export default routes;

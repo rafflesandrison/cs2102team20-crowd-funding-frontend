@@ -22,6 +22,9 @@
             <b-nav-item v-if="this.$store.state.auth.isLoggedIn">
               <router-link to="/create">Create Project</router-link>
             </b-nav-item>
+            <b-nav-item v-if="this.$store.state.auth.isLoggedIn">
+              <router-link to="/users">Users</router-link>
+            </b-nav-item>
           </b-navbar-nav>
 
           <!-- Right aligned nav items -->
