@@ -3,15 +3,19 @@
         <b-card no-body class="overflow-hidden" style="width: 100%;"
                 v-for="(project, index) in createdProjects" :key="index">
             <b-row no-gutters>
-                <b-col md="4">
+                <b-col md="3">
                     <b-card-img src="https://picsum.photos/200/200" class="rounded-0"></b-card-img>
                 </b-col>
-                <b-col md="8">
+                <b-col md="7">
                     <b-card-body :title="project.project_name">
                         <b-card-text>
                             <p>{{project.project_description}}</p>
                         </b-card-text>
                     </b-card-body>
+                </b-col>
+                <b-col md="2">
+                    <b-button variant="success">Edit</b-button>
+                    <b-button variant="danger" @click="deleteCreatedProject(project.project_name)">Delete</b-button>
                 </b-col>
             </b-row>
         </b-card>
@@ -29,7 +33,10 @@
 
         },
         methods: {
-
+            deleteCreatedProject(projectName) {
+                console.log("projectName is " + projectName)
+                this.$emit("delete:createdProject", projectName)
+            },
         }
     }
 </script>

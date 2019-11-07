@@ -11,8 +11,8 @@
     </b-row>
     <br><br>
     <b-row class="text-center">
-      <b-col><h3>Backed X projects</h3></b-col>
-      <b-col cols="5"><h3>Pledge X rewards</h3></b-col>
+      <b-col><h3>Created {{numOfCreatedProjects}} projects</h3></b-col>
+      <b-col><h3>Backed {{numOfBackedProjects}} projects</h3></b-col>
       <b-col><h3>Joined since XXXXX</h3></b-col>
     </b-row>
 
@@ -33,6 +33,7 @@
           <!-- Projects Created -->
           <projects-created-section
                   v-bind:createdProjects="createdProjects"
+                  @delete:createdProject="deleteCreatedProject"
           />
         </b-tab>
       </b-tabs>
@@ -65,6 +66,14 @@ export default {
   mounted() {
     this.loadBackedProjects()
     this.loadCreatedProjects()
+  },
+  computed: {
+    numOfBackedProjects() {
+      return this.backedProjects.length
+    },
+    numOfCreatedProjects() {
+      return this.createdProjects.length
+    }
   },
   methods: {
     loadBackedProjects() {
@@ -99,6 +108,44 @@ export default {
                 alert(error);
               });
     },
+    deleteCreatedProject(projectName) {
+      axios
+              .delete("http://localhost:3000/profile/deleteCreatedProject/" + this.$store.state.user.email
+                      + "/" + projectName)
+              .then(response => {
+                //this.$set(this.projectNames, 0, parsedProjectName)
+                //this.projectNames.push(parsedProjectName)
+                //console.log(this.projectNames.toString());
+                alert(response.data);
+                // this.$router.push("/project/" + form.projectName);
+                for (let i = 0; i < this.createdProjects.length; i++) {
+                  if (this.createdProjects[i].project_name == projectName) {
+                    this.$delete(this.createdProjects,i)
+                    break;
+                  }
+                }
+              })
+              .catch(error => {
+                // console.log(error.response.data);
+                alert(error.response.data);
+              });
+    },
+    unbackBackedProject(projectName) {
+      axios
+              .delete("http://localhost:3000/profile/" + this.$store.state.user.email + "/unbackProject", projectName)
+              .then(response => {
+                //this.$set(this.projectNames, 0, parsedProjectName)
+                //this.projectNames.push(parsedProjectName)
+                //console.log(this.projectNames.toString());
+                alert(response.data);
+                // this.$router.push("/project/" + form.projectName);
+
+              })
+              .catch(error => {
+                // console.log(error.response.data);
+                alert(error.response.data);
+              });
+    }
   }
 };
 </script>
