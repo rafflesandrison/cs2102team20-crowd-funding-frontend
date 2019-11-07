@@ -361,7 +361,7 @@ export default {
     backProjectWithoutReward() {
            // TODO: provide front-end check on negative backs-amount
       axios
-        .post(`/project/${this.project.project_name}/back`, {
+        .post(`/project/${this.project.project_name}/backNoReward`, {
           user_email: this.$store.state.user.email,
           project_backed_name: this.project.project_name,
           backs_amount: this.backs_amount
@@ -382,11 +382,13 @@ export default {
             this.listBackings();
           }
         })
-        .catch(() => {
+        .catch((error) => {
           this.$message({
             message: "An error occurred.",
             type: "warning"
           });
+
+          alert(JSON.stringify(error));
         });
     },
     unbackProject(reward) {
