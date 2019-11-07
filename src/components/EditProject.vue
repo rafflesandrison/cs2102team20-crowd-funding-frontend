@@ -1,6 +1,11 @@
 <template>
   <div class="create-form container fluid" v-if="this.$store.state.auth.isLoggedIn">
-    <create-project-form v-bind:projectNames="projectNames" @create:project="createProject" />
+    <edit-project-form
+            @edit:project="editProject"
+            v-bind:projectNames="projectNames"
+            v-bind:project="project"
+            v-bind:rewards="rewards"
+    />
     <b-card class="mt-3" header="Form Data Result">
       <pre class="m-0">{{ form }}</pre>
     </b-card>
@@ -12,21 +17,23 @@
 
 <script>
 import axios from "axios";
-import CreateProjectForm from "../sub-components/CreateProjectForm";
+import EditProjectForm from "../sub-components/EditProjectForm";
 
 export default {
   data() {
     return {
       projectNames: [],
-      redirectUrl: "",
-      createSuccess: false
+        project: null,
+        rewards: null,
     };
   },
   components: {
-    CreateProjectForm
+    EditProjectForm
   },
   mounted() {
     this.loadProjectNames();
+    this.loadProject();
+    this.loadRewards();
   },
   methods: {
     loadProjectNames() {
@@ -39,9 +46,39 @@ export default {
           alert(error);
         });
     },
-    createProject(form) {
+    loadProject() {
+        axios
+            .get("http://localhost:3000/project/" + this.$route.params.projectName)
+            .then(response => {
+                this.project = response.data;
+
+                this.project.project_deadline = this.project.project_deadline
+                    .substr(0, this.project.project_deadline.indexOf("T"));
+                console.log(this.project)
+            })
+            .catch(error => {
+                alert(error);
+            });
+    },
+      loadRewards() {
+          axios
+              .get(
+                  "http://localhost:3000/project/" +
+                  this.$route.params.projectName +
+                  "/rewards"
+              )
+              .then(response => {
+                  console.log("Edit project rewards:")
+                  console.log(response.data);
+                  this.rewards = response.data;
+              })
+              .catch(error => {
+                  alert("loadReward()" + error);
+              });
+      },
+    updateProject(form) {
       axios
-        .post("http://localhost:3000/create", {
+        .put("http://localhost:3000/updateProject", {
           projectName: form.projectName,
           projectCategory: form.projectCategory,
           projectImageUrl: form.projectImageUrl,
@@ -56,7 +93,7 @@ export default {
           //this.projectNames.push(parsedProjectName)
           //console.log(this.projectNames.toString());
           alert("Project ~Test~ Created!");
-          this.$router.push("/project/" + form.projectName);
+          // this.$router.push("/project/" + form.projectName);
         })
         .catch(error => {
           // console.log(error.response.data);

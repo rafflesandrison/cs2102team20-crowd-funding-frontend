@@ -75,7 +75,7 @@ export default {
       });
     },
     goProfilePage() {
-      this.$router.push("/profile");
+      this.$router.push("/profile/" + this.$store.state.user.email);
     }
   }
 };

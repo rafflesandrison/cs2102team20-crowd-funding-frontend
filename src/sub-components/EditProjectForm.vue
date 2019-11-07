@@ -1,5 +1,5 @@
 <template>
-  <b-form @submit="createProject" @reset="onReset">
+  <b-form @submit="editProject" @reset="onReset">
     <b-form-group
       id="input-group-project-name"
       label="Project Name:"
@@ -7,7 +7,7 @@
     >
       <b-form-input
         id="input-project-title"
-        v-model="form.projectName"
+        v-model="project.project_name"
         type="text"
         required
         @focus="clearStatus"
@@ -24,7 +24,7 @@
     <b-form-group id="input-group-category" label="Category:" label-for="input-category">
       <b-form-select
         id="input-category"
-        v-model="form.projectCategory"
+        v-model="project.project_category"
         :options="categories"
         required
       ></b-form-select>
@@ -33,13 +33,13 @@
     <b-form-group id="input-group-image-url" label="Image Url:" label-for="input-image-url">
       <b-form-input
         id="input-image-url"
-        v-model="form.projectImageUrl"
+        v-model="project.project_image_url"
         placeholder="E.g. https://unsplash.com/photos/hD5HgJzhjG4"
       ></b-form-input>
     </b-form-group>
 
     <b-form-group id="input-group-deadline" label="Project End Date:" label-for="input-deadline">
-      <b-form-input id="input-deadline" v-model="form.projectDeadline" type="date" required></b-form-input>
+      <b-form-input id="input-deadline" v-model="project.project_deadline" type="date" required></b-form-input>
     </b-form-group>
 
     <b-form-group
@@ -49,7 +49,7 @@
     >
       <b-form-input
         id="input-funding-goal"
-        v-model="form.projectFundingGoal"
+        v-model="project.project_funding_goal"
         type="number"
         required
       ></b-form-input>
@@ -62,7 +62,7 @@
     >
       <b-form-textarea
         id="textarea-description"
-        v-model="form.projectDescription"
+        v-model="project.project_description"
         placeholder="Tell us more about your project..."
         rows="3"
         max-rows="16"
@@ -70,9 +70,9 @@
     </b-form-group>
 
     <h3>Rewards</h3>
-    <div v-for="(reward, index) in form.projectRewards" :key="index" class="card reward">
+    <div v-for="(reward, index) in rewards" :key="index" class="card reward">
       <b-form-group id="input-reward-name" label="Reward Name:" label-for="input-reward-name">
-        <b-form-input id="input-reward-name" v-model="reward.rewardName" type="text" required></b-form-input>
+        <b-form-input id="input-reward-name" v-model="reward.reward_name" type="text" required></b-form-input>
       </b-form-group>
       <b-form-group
         id="input-reward-pledge-amount"
@@ -81,7 +81,7 @@
       >
         <b-form-input
           id="input-reward-pledge-amount"
-          v-model="reward.rewardPledgeAmount"
+          v-model="reward.reward_pledge_amount"
           type="number"
           step=".01"
           required
@@ -94,7 +94,7 @@
       >
         <b-form-textarea
           id="textarea-reward-description"
-          v-model="reward.rewardDescription"
+          v-model="reward.reward_description"
           placeholder="Tell us more about the reward..."
           rows="3"
           max-rows="16"
@@ -102,34 +102,28 @@
       </b-form-group>
     </div>
     <b-button variant="success" @click="addMoreReward">Add More Reward</b-button>
-
     <b-button type="submit" variant="primary">Submit</b-button>
   </b-form>
 </template>
 
 <script>
 export default {
-  name: "CreateProjectForm",
+  name: "EditProjectForm",
   props: {
-    projectNames: Array
+    project: Object,
+      rewards: Array,
   },
   data() {
     return {
       // Convenience population of data, to be removed before production
       form: {
-        projectName: "Aer",
-        projectCategory: "Crafts",
-        projectImageUrl: "image.com",
-        projectDeadline: "2019-10-15",
-        projectFundingGoal: "45000",
-        projectDescription: "Good bag that is good",
-        projectRewards: [
-          {
-            rewardName: "r1",
-            rewardPledgeAmount: "1555",
-            rewardDescription: "description random"
-          }
-        ]
+        projectName: "",
+        projectCategory: "",
+        projectImageUrl: "",
+        projectDeadline: "",
+        projectFundingGoal: "",
+        projectDescription: "",
+        projectRewards: []
       },
       formStatus: {
         nameError: false
@@ -138,8 +132,7 @@ export default {
     };
   },
   methods: {
-    onReset(evt) {
-      evt.preventDefault();
+    onReset() {
       // Reset our form values
       this.form.projectName = "";
       this.form.projectCategory = "";
@@ -148,11 +141,11 @@ export default {
       this.form.projectFundingGoal = "";
       this.form.projectDescription = "";
     },
-    createProject() {
+    editProject() {
       // replace multi whitespaces with single space and remove extra space on both ends
-      var parsedProjectName = this.form.projectName
-        .replace(/\s+\s/g, " ")
-        .trim();
+      var parsedProjectName = this.project.project_name
+          .replace(/\s+\s/g, " ")
+          .trim();
       //console.log(this.projectNames.toString())
       //console.log(parsedProjectName)
       //console.log(this.projectNames.indexOf(parsedProjectName));
@@ -161,7 +154,15 @@ export default {
         return;
       }
       this.form.projectName = parsedProjectName;
-      this.$emit("create:project", this.form);
+      this.$emit("create:project", {
+          project_name: this.project.project_name,
+          projectCategory: this.project.project_category,
+          projectImageUrl: this.project.project_image_url,
+          projectDeadline: this.project.project_deadline,
+          projectFundingGoal: this.project.project_funding_goal,
+          projectDescription: this.project.project_description,
+          projectRewards: this.rewards
+      });
     },
     addMoreReward() {
       this.form.projectRewards.push({
