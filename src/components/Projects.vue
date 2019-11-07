@@ -19,17 +19,37 @@
             ></el-option>
           </el-select>
         </el-col>
+        <div>
+          Top Searches of all time :
+          <span
+            class="mr-1"
+            v-for="result in popularSearches"
+            v-bind:key="result.search_text"
+          >{{result.search_text}},</span>
+        </div>
+        <div>
+          Featured Projects :
+          <span
+            class="mr-1"
+            v-for="result in hyperProjects"
+            v-bind:key="result.project_name"
+          >{{result.project_name}},</span>
+        </div>
+        <div>
+          Fast funded projects :
+          <span
+            class="mr-1"
+            v-for="result in fastFunded"
+            v-bind:key="result.project_name"
+          >{{result.project_name}} in {{result.timetaken}},</span>
+        </div>
       </div>
     </el-row>
     <el-col>
       <data-tables :data="this.tableData" :action-col="actionCol" :filters="filters">
-        <el-table-column
-          v-for="title in titles"
-          :prop="title.prop"
-          :label="title.label"
-          :key="title.prop"
-          sortable="custom"
-        />
+        <el-table-column label="Name" prop="project_name" sortable="custom"></el-table-column>
+        <el-table-column label="Category" prop="project_category" sortable="custom"></el-table-column>
+        <el-table-column label="Creator" prop="email" sortable="custom"></el-table-column>
       </data-tables>
     </el-col>
   </div>
@@ -70,20 +90,47 @@ export default {
       selectedRow: [],
       categories: [],
       tableData: [],
+      projects: [],
       selectedValue: null,
-      searchText: ""
+      searchText: "",
+      popularSearches: [],
+      hyperProjects: [],
+      fastFunded: []
     };
   },
 
   beforeMount() {
     this.loadProjects();
-    this.loadHeaders();
     this.loadCategories();
+    this.getPopularSearches();
+    this.loadHyperProjects();
+    this.loadFastFundedProjects();
   },
 
   methods: {
-    changeCategory() {
-      // alert("Change category");
+    loadFastFundedProjects() {
+      axios
+        .get("/projects/fastfund")
+        .then(response => {
+          this.fastFunded = response.data.rows;
+        })
+        .catch(error => {
+          // Failure
+          alert(error);
+        });
+      // this.$refs.table.refresh(); // Force a refresh
+    },
+    loadHyperProjects() {
+      axios
+        .get("/projects/hyper")
+        .then(response => {
+          this.hyperProjects = response.data.rows;
+        })
+        .catch(error => {
+          // Failure
+          alert(error);
+        });
+      // this.$refs.table.refresh(); // Force a refresh
     },
     loadCategories() {
       axios
@@ -96,6 +143,18 @@ export default {
           alert(error);
         });
       // this.$refs.table.refresh(); // Force a refresh
+    },
+    getPopularSearches() {
+      axios
+        .get("/search/popsearches")
+        .then(response => {
+          console.log("popular searches:" + this.popularSearches);
+          this.popularSearches = response.data;
+        })
+        .catch(error => {
+          // Failure
+          alert(error);
+        });
     },
 
     loadHeaders() {
@@ -126,8 +185,8 @@ export default {
       axios
         .get("/projects")
         .then(response => {
-          this.tableData = response.data;
-          console.log(this.tableData);
+          this.projects = response.data;
+          this.tableData = this.projects;
         })
         .catch(error => {
           alert(error);
@@ -135,13 +194,29 @@ export default {
     },
 
     triggerSearch() {
-      this.filters[0].value = this.searchText;
+      //if search for nothing just return the list of projects
+      if (this.searchText === "") {
+        this.tableData = this.projects;
+        return;
+      } else {
+        axios
+          .get("/search/project/" + this.searchText)
+          .then(response => {
+            this.tableData = response.data;
+            console.log(this.tableData);
+          })
+          .catch(error => {
+            alert(error);
+          });
+      }
+
       const email = this.$store.state.user.email;
       if (email == null || this.searchText === "") {
         return;
       }
+
       axios
-        .post("/search", {
+        .post("/search/add", {
           email: email,
           search_text: this.searchText
         })
