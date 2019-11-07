@@ -69,7 +69,8 @@
 export default {
   methods: {
     logout() {
-      this.$store.dispatch("logout").then(() => {
+      this.$store.dispatch("logout")
+      .then(() => {
         this.$message("Successfully logged out!");
         this.$router.push("/home");
       });

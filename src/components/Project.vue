@@ -382,11 +382,13 @@ export default {
             this.listBackings();
           }
         })
-        .catch(() => {
+        .catch((error) => {
           this.$message({
             message: "An error occurred.",
             type: "warning"
           });
+
+          alert(JSON.stringify(error));
         });
     },
     unbackProject(reward) {

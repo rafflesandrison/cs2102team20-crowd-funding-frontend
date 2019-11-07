@@ -29,8 +29,13 @@ export default {
     },
 
     logout({ commit }) {
-      commit("updateUser", null);
+      commit("updateUser", {
+        email: null,
+        full_name: null,
+        phone_number: null
+      });
       commit("userLogout");
+
     }
   }
 };

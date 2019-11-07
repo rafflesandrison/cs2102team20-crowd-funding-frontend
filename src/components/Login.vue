@@ -72,9 +72,10 @@ export default {
       this.form.password = "";
     },
     logout() {
-      this.$store.dispatch("logout").then(() => {
-        this.$message("Successfully logged out!");
-      });
+      this.$store.dispatch("logout")
+      .then(() => {
+        this.$message("You've logged out!");
+      })
     }
   }
 };
