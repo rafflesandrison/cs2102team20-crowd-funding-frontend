@@ -2,6 +2,7 @@
   <div class="create-form container fluid" v-if="this.$store.state.auth.isLoggedIn">
     <edit-project-form
             @edit:project="editProject"
+            @edit:reward="editReward"
             v-bind:projectNames="projectNames"
             v-bind:project="project"
             v-bind:rewards="rewards"
@@ -83,7 +84,6 @@ export default {
           projectCategory: form.projectCategory,
           projectImageUrl: form.projectImageUrl,
           projectDescription: form.projectDescription,
-          projectRewards: form.projectRewards,
           creatorEmail: this.$store.state.user.email
         })
         .then(response => {
@@ -94,10 +94,20 @@ export default {
           this.$router.push("/profile/" + this.$store.state.user.email);
         })
         .catch(error => {
-          alert("Chicken boy !")
-          // console.log(error.response.data);
           alert(error.response.data);
         });
+    },
+    editReward(reward) {
+      alert("Editing reward")
+      axios
+              .put("http://localhost:3000/editReward", reward)
+              .then(response => {
+                alert("Reward Updated!");
+                this.$router.push("/profile/" + this.$store.state.user.email);
+              })
+              .catch(error => {
+                alert(error.response.data);
+              });
     }
   }
 };
