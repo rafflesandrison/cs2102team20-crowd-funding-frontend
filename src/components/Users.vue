@@ -1,45 +1,80 @@
 <template>
-  <b-container class="bv-example-row">
-    <b-row>
-      <b-col cols="5">Name</b-col>
-      <b-col cols="5">Email</b-col>
-      <b-col cols="2">Action</b-col>
-    </b-row>
-    <br>
-    <div v-for="(user, index) in users" :key="index">
-      <b-row class="userRow" v-if="isUser(user.email) == false">
-        <b-col cols="5">{{user.full_name}}</b-col>
-        <b-col cols="5">{{user.email}}</b-col>
-        <b-col cols="2">
-          <b-button variant="success" @click="goProfilePage(user.email)">View Profile</b-button>
-        </b-col>
-      </b-row>
+  <div>
+    <el-input
+      class="mt-4 mb-4 ml-4"
+      placeholder="Search email"
+      v-model="searchText"
+      style="width:30%"
+    ></el-input>
+    <b-button v-on:click="triggerSearch" class="mr-4" variant="primary">Search</b-button>
+    <div>
+      Featured Backers :
+      <span
+        class="mr-1"
+        v-for="result in featuredBackers"
+        v-bind:key="result.email"
+      >{{result.email}},</span>
+    </div>
+    <div>
+      Featured Creators :
+      <span
+        class="mr-1"
+        v-for="result in featuredCreators"
+        v-bind:key="result.email"
+      >{{result.email}},</span>
     </div>
 
-  </b-container>
+    <data-tables :data="this.dataTable" :action-col="actionCol">
+      <el-table-column label="Name" prop="full_name" sortable="custom"></el-table-column>
+      <el-table-column label="Email" prop="email" sortable="custom"></el-table-column>
+    </data-tables>
+  </div>
 </template>
 
 <script>
-  import axios from "axios";
+import axios from "axios";
 
-  export default {
-    data() {
-      return {
-        fields: ['full_name', 'email', 'action'],
-        users: []
-      }
-    },
-    mounted() {
-      this.loadUsers()
-    },
-    methods: {
-      loadUsers() {
-        axios
-                .get("http://localhost:3000/users")
-                .then(res => {
-                  this.users = res.data
-                  console.log(res.data)
-                  /*res.data.forEach(user => {
+export default {
+  data() {
+    return {
+      fields: ["full_name", "email", "action"],
+      users: [],
+      dataTable: [],
+      searchText: "",
+      actionCol: {
+        props: {
+          label: ""
+        },
+        buttons: [
+          {
+            props: {
+              type: "primary"
+            },
+            handler: row => {
+              this.$router.push(`profile/${row.email}`);
+            },
+            label: "Select"
+          }
+        ]
+      },
+      featuredBackers: [],
+      featuredCreators: []
+    };
+  },
+  mounted() {
+    this.loadUsers();
+    this.loadFeaturedBackers();
+    this.loadFeaturedCreators();
+  },
+  methods: {
+    loadUsers() {
+      axios
+        .get("http://localhost:3000/users")
+        .then(res => {
+          this.users = res.data;
+          this.dataTable = this.users;
+          console.log(res.data);
+          /*res.data.forEach(user => {
                     this.users.push({
                       name: user.full_name,
                       email: user.email
@@ -47,23 +82,51 @@
                   })
                   console.log(this.users)
                   this.$set(this.users)*/
-                })
-                .catch(error => {
-                  alert(error)
-                })
-      },
-      goProfilePage(destinationUserProfileEmail) {
-        this.$router.push("/profile/" + destinationUserProfileEmail)
-      },
-      isUser(email) {
-        return this.$store.state.user.email === email
+        })
+        .catch(error => {
+          alert(error);
+        });
+    },
+    triggerSearch() {
+      if (this.searchText === "") {
+        this.dataTable = this.users;
+        return;
       }
+      axios
+        .get("http://localhost:3000/search/user/" + this.searchText)
+        .then(res => {
+          this.dataTable = res.data;
+        })
+        .catch(error => {
+          alert(error);
+        });
+    },
+    loadFeaturedBackers() {
+      axios
+        .get("http://localhost:3000/users/featuredbackers")
+        .then(res => {
+          this.featuredBackers = res.data;
+        })
+        .catch(error => {
+          alert(error);
+        });
+    },
+    loadFeaturedCreators() {
+      axios
+        .get("http://localhost:3000/users/featuredcreators")
+        .then(res => {
+          this.featuredBackers = res.data;
+        })
+        .catch(error => {
+          alert(error);
+        });
     }
   }
+};
 </script>
 
 <style>
-  .userRow {
-    margin-bottom: 10px
-  }
+.userRow {
+  margin-bottom: 10px;
+}
 </style>

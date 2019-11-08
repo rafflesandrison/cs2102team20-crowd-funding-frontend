@@ -203,6 +203,7 @@ export default {
           .get("/search/project/" + this.searchText)
           .then(response => {
             this.tableData = response.data;
+            getPopularSearches();
             console.log(this.tableData);
           })
           .catch(error => {

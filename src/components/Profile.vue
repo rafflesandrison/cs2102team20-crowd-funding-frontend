@@ -19,6 +19,7 @@
           variant="danger"
           @click="unfollow"
         >Unfollow</b-button>
+        <b-button v-if="isUser == true" variant="success" @click="goToWallet">Wallet</b-button>
       </b-col>
     </b-row>
     <br />
@@ -39,10 +40,6 @@
     <br />
     <div v-if="this.$store.state.auth.isLoggedIn">
       <b-tabs content-class="mt-3" fill>
-        <b-tab title="About" active>
-          <!-- About: general information about user -->
-          <p>About</p>
-        </b-tab>
         <b-tab title="Projects Backed">
           <!-- Project Backed -->
           <projects-backed-section v-bind:backedProjects="backedProjects" />
@@ -54,12 +51,12 @@
             @delete:createdProject="deleteCreatedProject"
           />
         </b-tab>
-        <b-tab title="Search History" active>
+        <b-tab title="Search History" active v-if="isUser">
           <b-button
             class="mb-4"
             variant="success"
             v-on:click="clearSearchHistory"
-          >Click here to clear search history</b-button>
+          >Clear search history</b-button>
           <b-table striped hover :items="this.searchHistory" :fields="this.searchFields"></b-table>
         </b-tab>
       </b-tabs>
@@ -290,6 +287,9 @@ export default {
           // console.log(error.response.data);
           alert(error.response.data);
         });
+    },
+    goToWallet() {
+      this.$router.push("/profile/wallet");
     }
   }
 };
