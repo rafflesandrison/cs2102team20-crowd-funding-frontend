@@ -8,29 +8,50 @@
             <b-col>
                 <h2>Rewards</h2>
                 <b-card
-                        :title="'$' + reward.reward_pledge_amount"
                         tag="article"
                         style="max-width: 20rem;"
                         class="mb-2"
                         v-for="(reward, index) in rewards"
                         :key="index"
                 >
-                    <b-card-text>
+                        <b-form-group
+                                v-if="isDonate(reward)"
+                                id="input-reward-pledge-amount"
+                                label="How much do you wish to donate?"
+                                label-for="input-reward-pledge-amount"
+                        >
+                            <b-form-input
+                                    id="input-reward-pledge-amount"
+                                    v-model="reward.reward_pledge_amount"
+                                    type="number"
+                                    step=".01"
+                                    required
+                            ></b-form-input>
+                        </b-form-group>
+                        <h4 v-else>${{reward.reward_pledge_amount}}</h4>
                         <h6>{{reward.reward_name}}</h6>
                         <p>{{reward.reward_description}}</p>
-                    </b-card-text>
+                    <!-- Buttons for Backed, Unbacked, Donate -->
                     <b-button
-                            v-if="!isBackedReward(reward.reward_name)"
+                            v-if="!isBackedReward(reward.reward_name) && !isDonate(reward)"
                             @click="pledge(reward.reward_name, reward.reward_pledge_amount)"
                             href="#" variant="success"
                     >
                         Pledge
                     </b-button>
-                    <b-button v-else
+                    <b-button v-if="isBackedReward(reward.reward_name) && !isDonate(reward)"
                               id="unback-btn"
                               @click="pledge(reward.reward_name, reward.reward_pledge_amount)"
                     >
                         <span>You have pledge for this reward!</span>
+                    </b-button>
+                    <b-button
+                            id="donate-btn"
+                            v-else-if="isDonate(reward)"
+                            @click="donate(reward.reward_pledge_amount)"
+                            href="#" variant="success"
+                    >
+                        Donate
                     </b-button>
                 </b-card>
             </b-col>
@@ -71,9 +92,20 @@
                     })
                 }
             },
+            donate(amount) {
+                alert("Donating" + amount + " for project " + this.project.project_name)
+                this.$emit("donate:money", {
+                    backer_email: this.$store.state.user.email,
+                    project_name: this.project.project_name,
+                    back_amount: amount,
+                })
+            },
             isBackedReward(rewardName) {
                 // If reward has been chosen during backing, return true
                 return this.backedRewards.indexOf(rewardName) >= 0
+            },
+            isDonate(reward) {
+                return reward.reward_name === null && reward.reward_description === null
             }
         }
     }
@@ -94,5 +126,10 @@
 
     #unback-btn:hover:before {
         content: "Remove pledge";
+    }
+
+    #donate-btn {
+        background: gold;
+        color: #2c3e50;
     }
 </style>

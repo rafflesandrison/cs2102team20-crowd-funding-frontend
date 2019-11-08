@@ -2,33 +2,43 @@
   <div>
     <b-jumbotron v-bind:header="project.project_name" v-if="this.$store.state.auth.isLoggedIn">
       <!-- Project Image  -->
-      <b-card img-src="https://placekitten.com/300/300" img-alt="Card image" img-left class="mb-3">
-        <b-card-text>
-          <h1>${{project.project_current_funding}}</h1>
-          <p>pledged of ${{project.project_funding_goal}} funding goal</p>
-        </b-card-text>
-        <b-card-text>
-          <h3>{{rewardsBackedCount}}</h3>
-          <p>rewards pledged by backers</p>
-        </b-card-text>
-        <b-card-text>
-          <h3>{{this.dayTillDeadline()}}</h3>
-          <p>days to go</p>
-        </b-card-text>
-        <p v-if="this.$store.state.auth.isLoggedIn">
-          <b-button variant="warning" v-b-modal.backs-modal @click="listBackings">Manage Backings</b-button>
-          <!-- <br/> -->
-          <!-- <b-button v-if="is_backed" variant="danger" v-b-modal.backs-modal @click="listBackings">Unback this project</b-button> -->
-        </p>
-        <p v-if="this.$store.state.auth.isLoggedIn">
-          <b-button :pressed.sync="is_liked" variant="outline-danger" @click="toggleLikeProject">
-            <i class="fa fa-heart" aria-hidden="true"></i> Like
-          </b-button>
-        </p>
-        <p>
-          This project will only be funding if it reaches
-          its goal by {{this.getFormattedDate(new Date(this.project.project_deadline))}}
-        </p>
+      <b-card>
+        <b-row>
+          <b-col md="5">
+            <b-card-img
+                    :src="project.project_image_url" class="rounded-0"
+                    v-bind="imageProp"
+            ></b-card-img>
+          </b-col>
+          <b-col md="7">
+            <b-card-text>
+              <h1>${{project.project_current_funding}}</h1>
+              <p>pledged of ${{project.project_funding_goal}} funding goal</p>
+            </b-card-text>
+            <b-card-text>
+              <h3>{{rewardsBackedCount}}</h3>
+              <p>rewards pledged by backers</p>
+            </b-card-text>
+            <b-card-text>
+              <h3>{{this.dayTillDeadline()}}</h3>
+              <p>days to go</p>
+            </b-card-text>
+            <p v-if="this.$store.state.auth.isLoggedIn">
+              <b-button variant="warning" v-b-modal.backs-modal @click="listBackings">Manage Backings</b-button>
+              <!-- <br/> -->
+              <!-- <b-button v-if="is_backed" variant="danger" v-b-modal.backs-modal @click="listBackings">Unback this project</b-button> -->
+            </p>
+            <p v-if="this.$store.state.auth.isLoggedIn">
+              <b-button :pressed.sync="is_liked" variant="outline-danger" @click="toggleLikeProject">
+                <i class="fa fa-heart" aria-hidden="true"></i> Like
+              </b-button>
+            </p>
+            <p>
+              This project will only be funding if it reaches
+              its goal by {{this.getFormattedDate(new Date(this.project.project_deadline))}}
+            </p>
+          </b-col>
+        </b-row>
       </b-card>
     </b-jumbotron>
 
@@ -43,6 +53,7 @@
                   v-bind:backedRewards="backedRewards"
                   @pledge:reward="backProject"
                   @unpledge:reward="unbackProject"
+                  @donate:money="donate"
           />
         </b-tab>
         <b-tab title="Updates">
@@ -63,8 +74,6 @@
     <div v-else>
       <p>Please log in dude.</p>
     </div>
-
-    <el-button @click="getBackedRewards">Click ME!</el-button>
 
     <b-modal title="Manage Backings" id="backs-modal" hide-footer>
       <div>
@@ -176,6 +185,10 @@ export default {
           label: 'Unback'
         }]
       },
+      imageProp: {
+        blank: true,
+        height: 400,
+      }
     };
   },
   beforeMount() {
@@ -214,6 +227,8 @@ export default {
         .then(response => {
           // console.log(response.data);
           this.rewards = response.data;
+          console.log("rewards are\n")
+          console.log(this.rewards)
         })
         .catch(error => {
           alert("loadReward()" + error);
@@ -290,7 +305,7 @@ export default {
                 projectName: this.project.project_name,
               })
               .then(response => {
-                this.$set(this.comments, 0, response.data)
+                this.$set(this.comments, this.comments.length, response.data)
               })
               .catch(error => {
                 alert("postComment()" + error)
@@ -357,40 +372,6 @@ export default {
           alert(JSON.stringify(error));
         });
     },
-
-    backProjectWithoutReward() {
-           // TODO: provide front-end check on negative backs-amount
-      axios
-        .post(`/project/${this.project.project_name}/backNoReward`, {
-          user_email: this.$store.state.user.email,
-          project_backed_name: this.project.project_name,
-          backs_amount: this.backs_amount
-        })
-        .then(response => {
-          if (response.data == "Failure") {
-            this.$message({
-              message: "You do not have enough cash.",
-              type: "error"
-            });
-          } else {
-            this.$message({
-              message: "Successfully backed.",
-              type: "success"
-            });
-            // this.$bvModal.hide("backs-modal");
-            this.is_backed = true;
-            this.listBackings();
-          }
-        })
-        .catch((error) => {
-          this.$message({
-            message: "An error occurred.",
-            type: "warning"
-          });
-
-          alert(JSON.stringify(error));
-        });
-    },
     unbackProject(reward) {
       console.log("unbackProject")
       console.log(`/project/${this.project.project_name}/unback`)
@@ -433,6 +414,49 @@ export default {
                   type: "warning"
                 });
               });
+    },
+    donate(detail) {
+      axios
+              .put(`/project/donate`, detail)
+              .then(res => {
+                alert("Donate success!")
+              })
+              .catch(error => {
+                alert(error)
+              })
+    },
+    backProjectWithoutReward() {
+           // TODO: provide front-end check on negative backs-amount
+      axios
+        .post(`/project/${this.project.project_name}/backNoReward`, {
+          user_email: this.$store.state.user.email,
+          project_backed_name: this.project.project_name,
+          backs_amount: this.backs_amount
+        })
+        .then(response => {
+          if (response.data == "Failure") {
+            this.$message({
+              message: "You do not have enough cash.",
+              type: "error"
+            });
+          } else {
+            this.$message({
+              message: "Successfully backed.",
+              type: "success"
+            });
+            // this.$bvModal.hide("backs-modal");
+            this.is_backed = true;
+            this.listBackings();
+          }
+        })
+        .catch((error) => {
+          this.$message({
+            message: "An error occurred.",
+            type: "warning"
+          });
+
+          alert(JSON.stringify(error));
+        });
     },
     listBackings() {
       if (this.is_backed) {

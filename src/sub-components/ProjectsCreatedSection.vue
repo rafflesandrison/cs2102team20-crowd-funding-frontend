@@ -4,7 +4,7 @@
                 v-for="(project, index) in createdProjects" :key="index">
             <b-row no-gutters>
                 <b-col md="3">
-                    <b-card-img src="https://picsum.photos/200/200" class="rounded-0"></b-card-img>
+                    <b-card-img :src="project.project_image_url" class="rounded-0"></b-card-img>
                 </b-col>
                 <b-col md="7">
                     <b-card-body :title="project.project_name">

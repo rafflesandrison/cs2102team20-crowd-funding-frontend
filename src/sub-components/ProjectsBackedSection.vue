@@ -4,7 +4,7 @@
                 v-for="(project, index) in backedProjects" :key="index">
             <b-row id="projectRow" no-gutters @click="goProjectPage(project.project_name)">
                 <b-col md="4">
-                    <b-card-img src="https://picsum.photos/200/200" class="rounded-0"></b-card-img>
+                    <b-card-img :src="project.project_image_url" class="rounded-0"></b-card-img>
                 </b-col>
                 <b-col md="8">
                     <b-card-body :title="project.project_name">

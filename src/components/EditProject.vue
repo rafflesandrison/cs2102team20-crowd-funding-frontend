@@ -6,9 +6,6 @@
             v-bind:project="project"
             v-bind:rewards="rewards"
     />
-    <b-card class="mt-3" header="Form Data Result">
-      <pre class="m-0">{{ form }}</pre>
-    </b-card>
   </div>
   <div v-else>
     <p>You are not logged in. Please log in to create a project.</p>
@@ -25,6 +22,7 @@ export default {
       projectNames: [],
         project: null,
         rewards: null,
+        oldProjectName: null,
     };
   },
   components: {
@@ -51,7 +49,7 @@ export default {
             .get("http://localhost:3000/project/" + this.$route.params.projectName)
             .then(response => {
                 this.project = response.data;
-
+                this.oldProjectName = response.data.project_name
                 this.project.project_deadline = this.project.project_deadline
                     .substr(0, this.project.project_deadline.indexOf("T"));
                 console.log(this.project)
@@ -60,7 +58,7 @@ export default {
                 alert(error);
             });
     },
-      loadRewards() {
+    loadRewards() {
           axios
               .get(
                   "http://localhost:3000/project/" +
@@ -76,14 +74,14 @@ export default {
                   alert("loadReward()" + error);
               });
       },
-    updateProject(form) {
+    editProject(form) {
+      alert("Editing project")
       axios
-        .put("http://localhost:3000/updateProject", {
+        .put("http://localhost:3000/editProject/" + this.oldProjectName, {
+          oldProjectName: this.oldProjectName,
           projectName: form.projectName,
           projectCategory: form.projectCategory,
           projectImageUrl: form.projectImageUrl,
-          projectDeadline: form.projectDeadline,
-          projectFundingGoal: form.projectFundingGoal,
           projectDescription: form.projectDescription,
           projectRewards: form.projectRewards,
           creatorEmail: this.$store.state.user.email
@@ -92,10 +90,11 @@ export default {
           //this.$set(this.projectNames, 0, parsedProjectName)
           //this.projectNames.push(parsedProjectName)
           //console.log(this.projectNames.toString());
-          alert("Project ~Test~ Created!");
-          // this.$router.push("/project/" + form.projectName);
+          alert("Project Updated!");
+          this.$router.push("/profile/" + this.$store.state.user.email);
         })
         .catch(error => {
+          alert("Chicken boy !")
           // console.log(error.response.data);
           alert(error.response.data);
         });
