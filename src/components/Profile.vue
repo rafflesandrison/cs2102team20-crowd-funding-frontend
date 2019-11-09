@@ -61,7 +61,6 @@
         </b-tab>
       </b-tabs>
     </div>
-
     <div v-else>
       <p>Please log in dude.</p>
     </div>
@@ -80,6 +79,7 @@ export default {
   },
   data() {
     return {
+      feedback: "",
       mainProps: {
         blank: false,
         blankColor: "#777",
@@ -91,7 +91,8 @@ export default {
       createdProjects: [],
       isFollowed: null,
       searchHistory: [],
-      searchFields: ["search_timestamp", "search_text"]
+      searchFields: ["search_timestamp", "search_text"],
+      feedBacks:[]
     };
   },
   mounted() {
@@ -99,6 +100,7 @@ export default {
     this.loadBackedProjects();
     this.loadCreatedProjects();
     this.loadSearchHistory();
+    this.loadFeedBack();
   },
   computed: {
     numOfBackedProjects() {
@@ -112,6 +114,10 @@ export default {
     }
   },
   methods: {
+    loadFeedBack() {
+      axios.get("http://localhost:3000/feedback" + this.$route.params.email
+)
+    },
     loadIsFollowed() {
       console.log(
         "http://localhost:3000/profile/follows/" +
