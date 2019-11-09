@@ -115,6 +115,10 @@
                 }
             },
             donate(amount) {
+                if (amount == 0) {
+                    this.$message("You cannot donate $0!");
+                    return;
+                }
                 alert("Donating" + amount + " for project " + this.project.project_name)
                 this.$emit("donate:money", {
                     backer_email: this.$store.state.user.email,
