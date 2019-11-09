@@ -42,11 +42,11 @@
                 v-if="project.ended && !fullyFunded"
                 @click="collectRefund"
               >Collect Refund</b-button>
-              <b-button
+              <!-- <b-button
                 variant="outline-success"
                 v-if="project.ended && fullyFunded"
                 v-b-modal.backs-modal
-              >Give Feedback</b-button>
+              >Give Feedback</b-button> -->
               <!-- <br/> -->
               <!-- <b-button v-if="is_backed" variant="danger" v-b-modal.backs-modal @click="listBackings">Unback this project</b-button> -->
             </p>
