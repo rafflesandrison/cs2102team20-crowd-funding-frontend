@@ -40,6 +40,8 @@
                     </div>
                 </div>
             </div>
+            </div>
+            </div>
     </b-card>
   </b-container>
 </template>
