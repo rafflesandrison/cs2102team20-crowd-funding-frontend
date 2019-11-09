@@ -9,6 +9,11 @@
           rounded="circle"
           alt="Center Circle image"
         ></b-img>
+      </b-col>
+    </b-row>
+    </br>
+    <b-row class="text-center">
+      <b-col cols="12">
         <b-button
           v-if="isUser == false && isFollowed == false"
           variant="success"
@@ -30,9 +35,6 @@
       </b-col>
       <b-col>
         <h3>Backed {{numOfBackedProjects}} projects</h3>
-      </b-col>
-      <b-col>
-        <h3>Joined since XXXXX</h3>
       </b-col>
     </b-row>
 
