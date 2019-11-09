@@ -24,15 +24,29 @@
               <!--
               <b-button variant="warning" v-b-modal.backs-modal @click="listBackings">Manage Backings</b-button>
               -->
-              <b-button v-if="!project.ended" variant="success" :disabled="true" v-b-modal.backs-modal>Ongoing Campaign</b-button>
-              <b-button v-if="project.ended" variant="dark" :disabled="true" v-b-modal.backs-modal>Campaign Ended</b-button>
-              <br>
-              <b-button variant="outline-success"
-                        v-if="project.ended && !fullyFunded"
-                        @click="collectRefund">Collect Refund</b-button>
-              <b-button variant="outline-success"
-                        v-if="project.ended && fullyFunded"
-                        v-b-modal.backs-modal>Give Feedback</b-button>
+              <b-button
+                v-if="!project.ended"
+                variant="success"
+                :disabled="true"
+                v-b-modal.backs-modal
+              >Ongoing Campaign</b-button>
+              <b-button
+                v-if="project.ended"
+                variant="dark"
+                :disabled="true"
+                v-b-modal.backs-modal
+              >Campaign Ended</b-button>
+              <br />
+              <b-button
+                variant="outline-success"
+                v-if="project.ended && !fullyFunded"
+                @click="collectRefund"
+              >Collect Refund</b-button>
+              <b-button
+                variant="outline-success"
+                v-if="project.ended && fullyFunded"
+                v-b-modal.backs-modal
+              >Give Feedback</b-button>
               <!-- <br/> -->
               <!-- <b-button v-if="is_backed" variant="danger" v-b-modal.backs-modal @click="listBackings">Unback this project</b-button> -->
             </p>
@@ -258,10 +272,13 @@ export default {
   },
   computed: {
     fullyFunded() {
-      return parseFloat(this.project.project_funding_received) >= parseFloat(this.project.project_funding_goal)
+      return (
+        parseFloat(this.project.project_funding_received) >=
+        parseFloat(this.project.project_funding_goal)
+      );
     },
     isOwner() {
-      return this.$store.state.user.email == this.project.email
+      return this.$store.state.user.email == this.project.email;
     }
   },
   methods: {
@@ -278,7 +295,7 @@ export default {
           alert("loadProjcet(): " + error);
         });
     },
-      loadCurrentFunding() {
+    loadCurrentFunding() {
       axios
         .get(
           "http://localhost:3000/project/currentFunding/" +
@@ -492,39 +509,46 @@ export default {
         reward_name: reward.reward_name
       });
       axios
-              .post(`/project/${this.project.project_name}/unback`, {
-                user_email: this.$store.state.user.email,
-                project_backed_name: this.project.project_name,
-                reward_name: reward.reward_name,
-              })
-              .then(response => {
-                if (response.data == "Failure") {
-                  this.$message({
-                    message: "Unable to unback at the moment...",
-                    type: "error"
-                  });
-                } else {
-                  this.$message({
-                    message: "Successfully unback",
-                    type: "success"
-                  });
-                  // this.$bvModal.hide("backs-modal");
-                  this.is_backed = false;
-                  this.listBackings();
-                  this.$delete(this.backedRewards, this.backedRewards.indexOf(reward.reward_name))
-                  this.$set(this.project, 'project_current_funding',
-                          this.projectCurrentFunding.project_current_funding - parseFloat(reward.back_amount))
-                  this.$set(this, 'rewardsBackedCount', this.rewardsBackedCount - 1)
-                  console.log("unback: backedRewards")
-                  console.log(this.backedRewards)
-                }
-              })
-              .catch(() => {
-                this.$message({
-                  message: "An error occurred.",
-                  type: "warning"
-                });
-              });
+        .post(`/project/${this.project.project_name}/unback`, {
+          user_email: this.$store.state.user.email,
+          project_backed_name: this.project.project_name,
+          reward_name: reward.reward_name
+        })
+        .then(response => {
+          if (response.data == "Failure") {
+            this.$message({
+              message: "Unable to unback at the moment...",
+              type: "error"
+            });
+          } else {
+            this.$message({
+              message: "Successfully unback",
+              type: "success"
+            });
+            // this.$bvModal.hide("backs-modal");
+            this.is_backed = false;
+            this.listBackings();
+            this.$delete(
+              this.backedRewards,
+              this.backedRewards.indexOf(reward.reward_name)
+            );
+            this.$set(
+              this.project,
+              "project_current_funding",
+              this.projectCurrentFunding.project_current_funding -
+                parseFloat(reward.back_amount)
+            );
+            this.$set(this, "rewardsBackedCount", this.rewardsBackedCount - 1);
+            console.log("unback: backedRewards");
+            console.log(this.backedRewards);
+          }
+        })
+        .catch(() => {
+          this.$message({
+            message: "An error occurred.",
+            type: "warning"
+          });
+        });
     },
     donate(detail) {
       axios
