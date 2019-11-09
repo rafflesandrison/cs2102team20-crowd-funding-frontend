@@ -33,12 +33,29 @@
               <b-button variant="outline-success"
                         v-if="hasEnded && !fullyFunded"
                         @click="collectRefund">Collect Refund</b-button>
+              <!-- <b-button variant="outline-success"
+                        v-if="hasEnded && fullyFunded"
+                        v-b-modal.backs-modal
+                        @click="giveFeedback">Give Feedback</b-button> -->
+
+                            <div>
               <b-button variant="outline-success"
                         v-if="hasEnded && fullyFunded"
-                        v-b-modal.backs-modal>Give Feedback</b-button>
+                        v-b-modal.modal-1
+                        @click="giveFeedback">Give Feedback</b-button>
+
+  <b-modal id="modal-1" title="Give Feedback" @ok="postFeedback">
+      <b-input-group>
+    <b-input-group-text>Feedback</b-input-group-text>
+    <b-form-input v-model="newFeedback"></b-form-input>
+<br/>
+          <b-form-select v-model="rating" :options="options" :select-size="4"></b-form-select>
+
+  </b-input-group>
+  </b-modal>
+</div>
               <!-- <br/> -->
               <!-- <b-button v-if="is_backed" variant="danger" v-b-modal.backs-modal @click="listBackings">Unback this project</b-button> -->
-            </p>
             <p v-if="this.$store.state.auth.isLoggedIn">
               <b-button :pressed.sync="is_liked" variant="outline-danger" @click="toggleLikeProject">
                 <i class="fa fa-heart" aria-hidden="true"></i> Like
@@ -77,6 +94,13 @@
           <comment-section
                   v-bind:comments="comments"
                   @post:comment="postComment"
+          />
+        </b-tab>
+
+        <b-tab title="Feedback">
+          <feedback-section
+                  v-bind:feedback="feedback"
+                  @post:feedback="postFeedback"
           />
         </b-tab>
       </b-tabs>
@@ -118,6 +142,7 @@ import axios from "axios";
 import CampaignSection from "../sub-components/CampaignSection";
 import UpdateSection from "../sub-components/UpdateSection";
 import CommentSection from "../sub-components/CommentSection";
+import FeedbackSection from "../sub-components/FeedbackSection";
 
 export default {
   name: "Project",
@@ -125,6 +150,7 @@ export default {
     CampaignSection,
     UpdateSection,
     CommentSection,
+    FeedbackSection
   },
   data() {
     return {
@@ -165,6 +191,17 @@ export default {
               email: 'abi@example.com'
           },
       ],
+      feedback: [],
+      newFeedback: '',
+      rating: [],
+      options: [
+          { value: null, text: 'Please select some rating' },
+          { value: 1, text: '1' },
+          { value: 2, text: '2' },
+          { value: 3, text: '3' },
+          { value: 4, text: '4' },
+          { value: 5, text: '5' },
+        ],
       rewardsBackedCount: 0,
       backDialogVisible: false,
       backs_amount: 0,
@@ -214,6 +251,9 @@ export default {
     this.isLiked();
     this.getBackedRewards();
   },
+  mounted() {
+    this.loadFeedback();
+  },
   computed: {
     hasEnded() {
       let now = new Date()
@@ -238,7 +278,7 @@ export default {
         })
         .catch(error => {
           // Failure
-          alert("loadProjet(): " + error);
+          alert("loadProject(): " + error);
         });
     },
     loadCurrentFunding() {
@@ -303,6 +343,28 @@ export default {
                 alert("loadComments()" + error);
               });
     },
+    loadFeedback() {
+
+
+      axios
+        .get("http://localhost:3000/project/" +
+                this.$route.params.projectName)
+        .then(response => {
+          axios
+            .get(`/feedback/${response.data.email}`)
+            .then(response => {
+              this.feedback = response.data;
+            })
+            .catch(error => {
+              alert("loadFeedback()" + error);
+            });
+        })
+        .catch(error => {
+          // Failure
+          alert("loadProject() within feedback: " + error);
+        });
+    
+  },
     loadTotalBackers() {
       axios
               .get(
@@ -572,6 +634,18 @@ export default {
               .catch(error => {
                 alert(error)
               })
+    },
+    postFeedback() {
+      axios
+        .post(`/feedback/create`, {
+          projectname: this.project.project_name,
+          feedback_text: this.newFeedback,
+          rating_number: this.rating,
+          email: this.$store.state.user.email
+        })
+                    .catch(error => {
+              alert("loadFeedback()" + error);
+            });
     }
   }
 };
