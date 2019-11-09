@@ -28,21 +28,40 @@
                     </b-card-body>
                 </b-col>
                 <b-col md="2" v-if="isUser">
-                    <br>
-                    <b-button variant="success" @click="editCreatedProject(project.project_name)">Edit</b-button>
-                    <br><br>
-                    <b-button variant="danger" @click="deleteCreatedProject(project.project_name)">Delete</b-button>
+                    <b-button
+                            v-if="!project.ended"
+                            class="general-btn"
+                            variant="success" @click="editCreatedProject(project.project_name)">Edit</b-button>
+                    <b-button
+                            v-if="!project.ended"
+                            class="general-btn"
+                            variant="danger" @click="deleteCreatedProject(project.project_name)">Delete</b-button>
+                    <b-button
+                            v-if="project.ended && fullyFunded(project) && !hasCollectFunding(project)"
+                            class="general-btn"
+                            pill variant="info" @click="redeemYourProjectFunds(project)">Redeem Project Funds</b-button>
                 </b-col>
                 <b-col md="2" v-if="isUser">
-                    <br>
                     <b-button
                             v-if="project.ended && fullyFunded(project)"
+                            class="general-btn"
+                            :disabled="true"
                             pill variant="success">Funded</b-button>
+                    <p v-if="project.ended && fullyFunded(project) && !hasCollectFunding(project)">
+                        You may redeem your project funds
+                    </p>
+                    <p v-if="project.ended && fullyFunded(project) && hasCollectFunding(project)">
+                        You have redeemed your project funds!
+                    </p>
                     <b-button
                             v-if="project.ended && !fullyFunded(project)"
+                            class="general-btn"
+                            :disabled="true"
                             pill variant="dark">Unsuccessful</b-button>
                     <b-button
                             v-if="!project.ended"
+                            class="general-btn"
+                            :disabled="true"
                             pill variant="info">Ongoing</b-button>
                 </b-col>
             </b-row>
@@ -74,6 +93,12 @@
             fullyFunded(project) {
                 return parseFloat(project.project_funding_received) >= parseFloat(project.project_funding_goal)
             },
+            hasCollectFunding(project) {
+                return project.received_funding_after_deadline && project.funding_received_after_deadline_is_valid;
+            },
+            redeemYourProjectFunds(project) {
+                this.$emit("redeem:projectFunds", project);
+            }
         }
     }
 </script>
@@ -81,5 +106,10 @@
 <style scoped>
     b-card-group {
         width: 500px;
+    }
+
+    .general-btn {
+        margin: 10px 10px 10px 10px;
+        display: inline-block;
     }
 </style>

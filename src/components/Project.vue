@@ -54,7 +54,7 @@
               <b-button
                 variant="outline-success"
                 v-b-modal.modal-1
-                v-if="hasEnded && fullyFunded"
+                v-if="project.ended && fullyFunded"
                 @click="giveFeedback"
               >Give Feedback</b-button>
 
@@ -103,7 +103,10 @@
         </b-tab>
         <b-tab title="Updates">
           <!-- Project Update -->
-          <update-section v-bind:updates="updates" />
+          <update-section
+                  v-bind:project="project"
+                  v-bind:updates="updates"
+          />
         </b-tab>
         <b-tab title="Comments">
           <comment-section v-bind:comments="comments" @post:comment="postComment" />
@@ -295,7 +298,7 @@ export default {
           alert("loadProjcet(): " + error);
         });
     },
-    loadCurrentFunding() {
+      loadCurrentFunding() {
       axios
         .get(
           "http://localhost:3000/project/currentFunding/" +

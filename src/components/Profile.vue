@@ -51,6 +51,7 @@
           <projects-created-section
             v-bind:createdProjects="createdProjects"
             @delete:createdProject="deleteCreatedProject"
+            @redeem:projectFunds="redeemProjectFunds"
           />
         </b-tab>
         <b-tab title="Search History" active v-if="isUser">
@@ -117,8 +118,7 @@ export default {
   },
   methods: {
     loadFeedBack() {
-      axios.get("http://localhost:3000/feedback" + this.$route.params.email
-)
+      axios.get("http://localhost:3000/feedback" + this.$route.params.email)
     },
     loadIsFollowed() {
       console.log(
@@ -298,6 +298,22 @@ export default {
     },
     goToWallet() {
       this.$router.push("/profile/wallet");
+    },
+    redeemProjectFunds(project) {
+      alert("Redeeming funds from profile");
+      console.log("project")
+      console.log(project)
+      axios
+              .post("http://localhost:3000/profile/transferProjectFundsToCreator", {
+                creatorEmail: project.email,
+                projectName: project.project_name
+              })
+              .then(res => {
+                alert("Transfer success!")
+              })
+              .catch(error => {
+                alert("Error: Unable to transfer project funds to creator.")
+              })
     }
   }
 };
