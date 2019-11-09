@@ -11,7 +11,7 @@
         ></b-img>
       </b-col>
     </b-row>
-    </br>
+    <br/>
     <b-row class="text-center">
       <b-col cols="12">
         <b-button
