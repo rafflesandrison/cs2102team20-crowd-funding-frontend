@@ -161,7 +161,11 @@ export default {
         toolTipText = `$${parseFloat(transactionData.amount) *
           -1} was transferred to ${transactionData.email}`;
       } else if (transactionData.type === "TransferFrom") {
-        toolTipText = `$${transactionData.amount} was transferred to you from ${transactionData.email}`;
+        if (transactionData.email === null) {
+          toolTipText = `$${transactionData.amount} was refunded to you.`;
+        } else {
+          toolTipText = `$${transactionData.amount} was transferred to you from ${transactionData.email}`;
+        }
       } else if (transactionData.type === "Backing") {
         toolTipText = `$${transactionData.amount} was used to back ${transactionData.project_name}`;
       }
