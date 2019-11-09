@@ -16,7 +16,7 @@
 
       <div class="row bootstrap snippets container main">
             <div class="col-md-8 col-md-offset-2 col-sm-12">
-            <div class="comment-wrapper">
+                <div class="comment-wrapper">
                 <div class="panel panel-info">
                     <div class="panel-heading">
                         Comment panel
@@ -41,7 +41,7 @@
                 </div>
             </div>
             </div>
-            </div>
+      </div>
     </b-card>
   </b-container>
 </template>

@@ -15,7 +15,7 @@
                         :key="index"
                 >
                         <b-form-group
-                                v-if="isDonate(reward)"
+                                v-if="isDonate(reward) && !isOwner"
                                 id="input-reward-pledge-amount"
                                 label="How much do you wish to donate?"
                                 label-for="input-reward-pledge-amount"
@@ -28,31 +28,48 @@
                                     required
                             ></b-form-input>
                         </b-form-group>
+                        <b-form-group
+                                v-if="isDonate(reward) && isOwner"
+                                id="input-reward-pledge-amount"
+                                label="Total donation received"
+                                label-for="input-reward-pledge-amount"
+                        >
+                            <b-form-input
+                                    id="input-reward-pledge-amount"
+                                    v-model="reward.reward_pledge_amount"
+                                    type="number"
+                                    step=".01"
+                                    required
+                                    disabled="true"
+                            ></b-form-input>
+                        </b-form-group>
                         <h4 v-else>${{reward.reward_pledge_amount}}</h4>
                         <h6>{{reward.reward_name}}</h6>
                         <p>{{reward.reward_description}}</p>
                     <!-- Buttons for Backed, Unbacked, Donate -->
-                    <b-button
-                            v-if="!isBackedReward(reward.reward_name) && !isDonate(reward)"
-                            @click="pledge(reward.reward_name, reward.reward_pledge_amount)"
-                            href="#" variant="success"
-                    >
-                        Pledge
-                    </b-button>
-                    <b-button v-if="isBackedReward(reward.reward_name) && !isDonate(reward)"
-                              id="unback-btn"
-                              @click="pledge(reward.reward_name, reward.reward_pledge_amount)"
-                    >
-                        <span>You have pledge for this reward!</span>
-                    </b-button>
-                    <b-button
-                            id="donate-btn"
-                            v-else-if="isDonate(reward)"
-                            @click="donate(reward.reward_pledge_amount)"
-                            href="#" variant="success"
-                    >
-                        Donate
-                    </b-button>
+                    <div v-if="!project.ended || isOwner">
+                        <b-button
+                                v-if="!isBackedReward(reward.reward_name) && !isDonate(reward) && !isOwner"
+                                @click="pledge(reward.reward_name, reward.reward_pledge_amount)"
+                                href="#" variant="success"
+                        >
+                            Pledge
+                        </b-button>
+                        <b-button v-if="isBackedReward(reward.reward_name) && !isDonate(reward) && !isOwner"
+                                  id="unback-btn"
+                                  @click="pledge(reward.reward_name, reward.reward_pledge_amount)"
+                        >
+                            <span>You have pledge for this reward!</span>
+                        </b-button>
+                        <b-button
+                                id="donate-btn"
+                                v-else-if="isDonate(reward) && !isOwner"
+                                @click="donate(reward.reward_pledge_amount)"
+                                href="#" variant="success"
+                        >
+                            Donate
+                        </b-button>
+                    </div>
                 </b-card>
             </b-col>
         </b-row>
@@ -70,6 +87,11 @@
         data() {
           return {
           }
+        },
+        computed: {
+            isOwner() {
+                return this.$store.state.user.email == this.project.email
+            }
         },
         methods: {
             pledge(rewardName, rewardAmount) {
