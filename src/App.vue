@@ -1,21 +1,29 @@
 <template>
   <div id="app">
     <div>
-      <b-navbar toggleable="lg" type="dark" variant="info">
-        <b-navbar-brand>GoGuru</b-navbar-brand>
+      <b-navbar toggleable="lg" type="light" variant="light">
+        <b-navbar-brand>
+          <router-link to="/">GoGuru</router-link>
+        </b-navbar-brand>
 
         <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
         <b-collapse id="nav-collapse" is-nav>
           <b-navbar-nav>
             <b-nav-item>
-              <router-link to="/">Home</router-link>
+              <router-link to="/">Login</router-link>
             </b-nav-item>
-            <b-nav-item type="dark">
+            <b-nav-item v-if="!this.$store.state.auth.isLoggedIn" type="dark">
               <router-link to="/Register">Register</router-link>
             </b-nav-item>
-            <b-nav-item>
-              <router-link to="/Register">P</router-link>
+            <b-nav-item type="dark">
+              <router-link to="/Projects">Projects</router-link>
+            </b-nav-item>
+            <b-nav-item v-if="this.$store.state.auth.isLoggedIn">
+              <router-link to="/create">Create Project</router-link>
+            </b-nav-item>
+            <b-nav-item v-if="this.$store.state.auth.isLoggedIn">
+              <router-link to="/users">Users</router-link>
             </b-nav-item>
           </b-navbar-nav>
 
@@ -25,21 +33,30 @@
               <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
               <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
             </b-nav-form>-->
-
+            <!-- 
             <b-nav-item-dropdown text="Lang" right>
               <b-dropdown-item href="#">EN</b-dropdown-item>
               <b-dropdown-item href="#">ES</b-dropdown-item>
               <b-dropdown-item href="#">RU</b-dropdown-item>
               <b-dropdown-item href="#">FA</b-dropdown-item>
-            </b-nav-item-dropdown>
+            </b-nav-item-dropdown>-->
 
             <b-nav-item-dropdown right>
               <!-- Using 'button-content' slot -->
               <template v-slot:button-content>
                 <em>User</em>
               </template>
-              <b-dropdown-item href="#">Profile</b-dropdown-item>
-              <b-dropdown-item href="#">Sign Out</b-dropdown-item>
+              <!-- <b-dropdown-item href="#">Profile</b-dropdown-item> -->
+              <b-dropdown-item
+                v-if="this.$store.state.auth.isLoggedIn"
+                @click="goProfilePage"
+              >{{ this.$store.state.user.email }}</b-dropdown-item>
+              <b-dropdown-item
+                v-if="this.$store.state.auth.isLoggedIn"
+                href="/"
+                @click="logout"
+              >Sign Out</b-dropdown-item>
+              <b-dropdown-item v-else href="/">Log In</b-dropdown-item>
             </b-nav-item-dropdown>
           </b-navbar-nav>
         </b-collapse>
@@ -52,7 +69,20 @@
 </template>
 
 <script>
-export default {};
+export default {
+  methods: {
+    logout() {
+      this.$store.dispatch("logout")
+      .then(() => {
+        this.$message("Successfully logged out!");
+        this.$router.push("/home");
+      });
+    },
+    goProfilePage() {
+      this.$router.push("/profile/" + this.$store.state.user.email);
+    }
+  }
+};
 </script>
 
 <style>
